@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل الدخول - عيادة الدكتور تامر خطاب</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+body { margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; background: linear-gradient(135deg, #1a237e, #3949ab); height: 100vh; display: flex; justify-content: center; align-items: center; }
+.login-box { background: #fff; padding: 30px; border-radius: 15px; width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; }
+.login-box h2 { margin-bottom: 20px; color: #1a237e; font-size: 20px; }
+input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; outline: none; transition: 0.3s; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
+input:focus { border-color: #1a237e; box-shadow: 0 0 5px rgba(26,35,126,0.3); }
+button { width: 100%; padding: 12px; background: #1a237e; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.3s; font-family: 'Tajawal', sans-serif; font-weight: 500; }
+button:hover { background: #3949ab; }
+button:disabled { background: #64748b; cursor: not-allowed; }
+::placeholder { color: #999; }
+.error-msg { color: #d32f2f; font-size: 13px; margin-top: 5px; display: none; min-height: 20px; }
+.success-msg { color: #22c55e; font-size: 13px; margin-top: 5px; display: none; }
+.login-footer { margin-top: 20px; font-size: 12px; color: #64748b; }
+.login-footer a { color: #1a237e; text-decoration: none; }
+.login-footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="login-box">
+  <h2>🔐 دخول لوحة التحكم</h2>
+  <p style="color:#64748b;font-size:13px;margin-bottom:15px">عيادة الدكتور تامر خطاب</p>
+  
+  <input type="email" id="email" placeholder="البريد الإلكتروني للأدمن">
+  <input type="password" id="password" placeholder="كلمة المرور">
+  <p id="errorMsg" class="error-msg"></p>
+  <p id="successMsg" class="success-msg">✅ جاري التحويل...</p>
+  
+  <button onclick="handleLogin()" id="loginBtn">دخول</button>
+  
+  <div class="login-footer">
+    <a href="index.html">← العودة للرئيسية</a>
+    <br><br>
+    <a href="#" onclick="resetPassword(); return false;">نسيت كلمة المرور؟</a>
+  </div>
+</div>
+
+<!-- ✅ كود الجافاسكريبت - محدث لمشروع الدكتور تامر -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ================= 🔥 FIREBASE CONFIG - مشروع الدكتور تامر خطاب 🔥 ================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyCXOOWSZU5YW0diViWO23mIXojmTLIggi0",
+  authDomain: "dr-tamer-khatab.firebaseapp.com",
+  projectId: "dr-tamer-khatab",
+  storageBucket: "dr-tamer-khatab.firebasestorage.app",
+  messagingSenderId: "801994611384",
+  appId: "1:801994611384:web:d91064d8549b25427fb24d",
+  measurementId: "G-F341FN0EL6"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ⚠️ الإيميل الرسمي للأدمن (عدّليه لو عايزة)
+const ADMIN_EMAIL = "admin@dr-tamer-khatab.com"; 
+
+/* ================= دالة الدخول ================= */
+window.handleLogin = async function() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const errorMsg = document.getElementById("errorMsg");
+  const successMsg = document.getElementById("successMsg");
+  const btn = document.getElementById("loginBtn");
+  
+  // إعادة تعيين الرسائل
+  errorMsg.style.display = "none";
+  errorMsg.textContent = "";
+  successMsg.style.display = "none";
+  
+  // تحقق من المدخلات
+  if (!email || !password) {
+    showError("⚠️ من فضلك أدخلي البريد وكلمة المرور");
+    return;
+  }
+  
+  // تعطيل الزر
+  btn.disabled = true;
+  btn.textContent = "جاري التحقق...";
+  
+  try {
+    // 1. تسجيل الدخول عبر فايربيس
+    const userCred = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCred.user;
+    
+    // 2. فحص الدور من قاعدة البيانات
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    const role = userDoc.exists() ? userDoc.data().role : "user";
+    
+    // 3. التوجيه حسب الدور
+    if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase() || role === "admin") {
+      showSuccess("✅ تم الدخول بنجاح، جاري التحويل...");
+      setTimeout(() => {
+        window.location.href = "admin.html";
+      }, 1500);
+    } else {
+      showError("⚠️ هذا الحساب ليس لديه صلاحيات أدمن");
+      btn.disabled = false;
+      btn.textContent = "دخول";
+    }
+    
+  } catch (err) {
+    console.error("Login Error:", err);
+    
+    // ترجمة الأخطاء
+    let msg = "❌ فشل تسجيل الدخول";
+    if (err.code === "auth/invalid-email") msg = "⚠️ صيغة البريد غير صحيحة";
+    else if (err.code === "auth/user-disabled") msg = "⚠️ هذا الحساب معطل";
+    else if (err.code === "auth/user-not-found") msg = "⚠️ لا يوجد حساب بهذا البريد";
+    else if (err.code === "auth/wrong-password") msg = "⚠️ كلمة المرور غير صحيحة";
+    else if (err.code === "auth/too-many-requests") msg = "⚠️ محاولات كثيرة، حاولي بعد شوية";
+    else if (err.code === "auth/network-request-failed") msg = "⚠️ تأكدِ من اتصال الإنترنت";
+    
+    showError(msg);
+    btn.disabled = false;
+    btn.textContent = "دخول";
+  }
+};
+
+/* ================= دالة إعادة تعيين كلمة المرور ================= */
+window.resetPassword = async function() {
+  const email = document.getElementById("email").value.trim();
+  if (!email) {
+    showError("⚠️ أدخلي البريد عشان نرسل رابط إعادة التعيين");
+    return;
+  }
+  
+  try {
+    await sendPasswordResetEmail(auth, email);
+    document.getElementById("successMsg").textContent = "✅ تم إرسال رابط إعادة التعيين لبريدك";
+    document.getElementById("successMsg").style.display = "block";
+    document.getElementById("errorMsg").style.display = "none";
+  } catch (err) {
+    showError("⚠️ فشل الإرسال، تأكدِ من صحة البريد");
+    console.error("Reset Error:", err);
+  }
+};
+
+/* ================= دوال مساعدة ================= */
+function showError(msg) {
+  const el = document.getElementById("errorMsg");
+  el.textContent = msg;
+  el.style.display = "block";
+  setTimeout(() => { el.style.display = "none"; }, 6000);
+}
+
+function showSuccess(msg) {
+  const el = document.getElementById("successMsg");
+  el.textContent = msg;
+  el.style.display = "block";
+}
+
+/* ================= تسجيل الخروج (للاستخدام في صفحات تانية) ================= */
+window.handleLogout = async function() {
+  try {
+    await auth.signOut();
+    window.location.href = "login.html";
+  } catch (err) {
+    console.error("Logout Error:", err);
+  }
+};
+
+console.log("✅ Login Page Loaded - dr-tamer-khatab Auth Ready");
+</script>
+
+</body>
+</html>
