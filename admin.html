@@ -327,13 +327,22 @@ window.selectSlot = async (id) => {
   } catch (err) { console.error("❌ Error loading slot:", err); }
 };
 
+// ✅ دالة updateSlot المُحدثة مع تأكيد النقل وإصلاح نقل البيانات
 window.updateSlot = async () => { 
   const activeSlotInput = $("activeSlotId");
   const currentId = (activeSlotInput && activeSlotInput.value) || activeId; 
-  if (!currentId) { console.error("❌ No slot ID found"); return alert("⚠️ اختر ميعاداً من الجدول أولاً"); }
-  activeId = currentId; 
+  
+  if (!currentId) { 
+    console.error("❌ No slot ID found"); 
+    return alert("⚠️ اختر ميعاداً من الجدول أولاً"); 
+  }
+  
   const saveBtn = $("saveBtn"); 
-  if (saveBtn) { saveBtn.disabled = true; saveBtn.innerText = "⏳ جاري الحفظ..."; }
+  if (saveBtn) { 
+    saveBtn.disabled = true; 
+    saveBtn.innerText = "⏳ جاري الحفظ..."; 
+  }
+  
   try {
     const newName = $("pName")?.value.trim();
     const newPhone = $("pPhone")?.value.trim();
@@ -342,40 +351,142 @@ window.updateSlot = async () => {
     const newStatus = $("pStatus")?.value;
     const selectedNewSlotId = $("availableSlots")?.value;
     const newDate = $("requestDate")?.value;
-    const patientData = { name: newName, phone: newPhone, notes: newNotes };
+    
+    // ✅ تجهيز بيانات المريض (لو في اسم يعني الحجز مؤكد)
     const isBooked = newName !== "";
-    let targetSlotId = activeId;
+    const patientData = isBooked ? { name: newName, phone: newPhone, notes: newNotes } : null;
+    
+    let targetSlotId = currentId;
     let isNewSlotCreated = false;
-    if (selectedNewSlotId && selectedNewSlotId !== activeId && selectedNewSlotId !== '__MANUAL__') {
+    
+    // 🔹 الحالة 1: نقل الميعاد لميعاد موجود آخر
+    if (selectedNewSlotId && selectedNewSlotId !== currentId && selectedNewSlotId !== '__MANUAL__') {
+      // ✅ تأكيد قبل النقل
+      const confirmMsg = `هل تريد نقل هذا الميعاد من ${editSlotDate} ${editSlotTime} إلى الميعاد المحدد؟`;
+      if (!confirm(confirmMsg)) {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = "حفظ"; }
+        return;
+      }
+      
       targetSlotId = selectedNewSlotId;
-    } else if (selectedNewSlotId === '__MANUAL__' && newDate) {
+      
+      // ✅ أولاً: نحجز الميعاد الجديد بالبيانات
+      await updateDoc(doc(db, "slots", targetSlotId), { 
+        booked: isBooked, 
+        status: isBooked ? newStatus : "available", 
+        paid: isBooked ? newPaid : 0, 
+        patient: patientData, 
+        updatedAt: serverTimestamp() 
+      });
+      
+      // ✅ ثانياً: نخلي الميعاد القديم متاح تاني (بدون بيانات)
+      await updateDoc(doc(db, "slots", currentId), { 
+        booked: false, 
+        status: "available", 
+        paid: 0, 
+        patient: null, 
+        updatedAt: serverTimestamp() 
+      });
+      
+      showAdminNotification("✅ تم نقل الميعاد بنجاح");
+      
+    } 
+    // 🔹 الحالة 2: إنشاء ميعاد جديد يدوي ونقل البيانات له
+    else if (selectedNewSlotId === '__MANUAL__' && newDate) {
       const manualTime = $("manualSlotTime")?.value;
-      if (!manualTime || !/^\d{2}:\d{2}$/.test(manualTime)) { if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = "حفظ"; } return alert("⚠️ أدخل وقتاً صحيحاً"); }
-      if (slotExists(newDate, manualTime)) { if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = "حفظ"; } return alert("⚠️ الوقت موجود"); }
-      const newSlotRef = await addDoc(slotsRef, { date: newDate, time: manualTime, booked: false, status: "available", patient: null, paid: 0, notes: "تم إنشاؤه عند نقل", isManual: true, createdAt: serverTimestamp() });
-      targetSlotId = newSlotRef.id; isNewSlotCreated = true;
+      
+      if (!manualTime || !/^\d{2}:\d{2}$/.test(manualTime)) { 
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = "حفظ"; } 
+        return alert("⚠️ أدخل وقتاً صحيحاً بالصيغة HH:MM"); 
+      }
+      
+      // نتأكد إن الوقت مش موجود أصلاً
+      if (slotExists(newDate, manualTime)) { 
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = "حفظ"; } 
+        return alert("⚠️ هذا الوقت موجود بالفعل، اختر وقت آخر"); 
+      }
+      
+      // ✅ تأكيد قبل إنشاء ميعاد جديد
+      const confirmMsg = `هل تريد إنشاء ميعاد جديد في ${newDate} ${manualTime} ونقل البيانات له؟`;
+      if (!confirm(confirmMsg)) {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = "حفظ"; }
+        return;
+      }
+      
+      // ✅ ننشئ الميعاد الجديد
+      const newSlotRef = await addDoc(slotsRef, { 
+        date: newDate, 
+        time: manualTime, 
+        booked: isBooked, 
+        status: isBooked ? newStatus : "available", 
+        paid: isBooked ? newPaid : 0, 
+        patient: patientData, 
+        notes: "تم إنشاؤه عند النقل", 
+        isManual: true, 
+        createdAt: serverTimestamp() 
+      });
+      
+      targetSlotId = newSlotRef.id; 
+      isNewSlotCreated = true;
+      
+      // ✅ نخلي الميعاد القديم متاح تاني
+      await updateDoc(doc(db, "slots", currentId), { 
+        booked: false, 
+        status: "available", 
+        paid: 0, 
+        patient: null, 
+        updatedAt: serverTimestamp() 
+      });
+      
+      showAdminNotification(isNewSlotCreated ? "✅ تم إنشاء ميعاد جديد ونقل البيانات" : "✅ تم النقل");
+      
+    } 
+    // 🔹 الحالة 3: تعديل في نفس الميعاد (بدون نقل)
+    else {
+      await updateDoc(doc(db, "slots", currentId), { 
+        booked: isBooked, 
+        status: isBooked ? newStatus : "available", 
+        paid: isBooked ? newPaid : 0, 
+        patient: patientData, 
+        updatedAt: serverTimestamp() 
+      });
+      showAdminNotification("✅ تم تعديل البيانات");
     }
-    if (targetSlotId !== activeId) {
-      const newSlotRef = doc(db, "slots", targetSlotId);
-      const oldSlotRef = doc(db, "slots", activeId);
-      await updateDoc(newSlotRef, { booked: isBooked, status: isBooked ? newStatus : "available", paid: isBooked ? newPaid : 0, patient: isBooked ? patientData : null, updatedAt: serverTimestamp() });
-      await updateDoc(oldSlotRef, { booked: false, status: "available", paid: 0, patient: null, updatedAt: serverTimestamp() });
-      showAdminNotification(isNewSlotCreated ? "✅ تم إنشاء ونقل" : "✅ تم النقل");
-    } else {
-      await updateDoc(doc(db, "slots", activeId), { booked: isBooked, status: isBooked ? newStatus : "available", paid: isBooked ? newPaid : 0, patient: isBooked ? patientData : null, updatedAt: serverTimestamp() });
-      showAdminNotification("✅ تم التعديل");
-    }
-    activeId = null; if (activeSlotInput) activeSlotInput.value = "";
-    if ($("pName")) $("pName").value = ""; if ($("pPhone")) $("pPhone").value = "";
-    if ($("pNotes")) $("pNotes").value = ""; if ($("pPaid")) $("pPaid").value = "";
-    if ($("pStatus")) $("pStatus").value = "حجز"; if ($("targetTime")) $("targetTime").innerText = "اختر ميعاداً";
-    if ($("availableSlots")) $("availableSlots").value = ""; if ($("requestDate")) $("requestDate").value = "";
-    const manualWrapper = $("manualTimeWrapper"); if (manualWrapper) manualWrapper.style.display = "none";
+    
+    // ✅ إعادة تعيين الحقول بعد النجاح
+    activeId = null; 
+    if (activeSlotInput) activeSlotInput.value = "";
+    
+    if ($("pName")) $("pName").value = ""; 
+    if ($("pPhone")) $("pPhone").value = "";
+    if ($("pNotes")) $("pNotes").value = ""; 
+    if ($("pPaid")) $("pPaid").value = "";
+    if ($("pStatus")) $("pStatus").value = "حجز"; 
+    if ($("targetTime")) $("targetTime").innerText = "اختر ميعاداً";
+    if ($("availableSlots")) $("availableSlots").value = ""; 
+    if ($("requestDate")) $("requestDate").value = "";
+    
+    const manualWrapper = $("manualTimeWrapper"); 
+    if (manualWrapper) manualWrapper.style.display = "none";
     if ($("manualSlotTime")) $("manualSlotTime").value = "18:00";
+    
     document.querySelectorAll('.slot-item.selected').forEach(el => el.classList.remove('selected'));
-    editSlotDate = ""; editSlotTime = "";
-  } catch (err) { console.error("❌ Update Error:", err); alert("❌ فشل: " + err.message);
-  } finally { const saveBtn = $("saveBtn"); if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = "حفظ"; } }
+    editSlotDate = ""; 
+    editSlotTime = "";
+    
+    // ✅ تحديث العرض فوراً
+    renderSlots();
+    
+  } catch (err) { 
+    console.error("❌ Update Error:", err); 
+    alert("❌ فشل في الحفظ: " + err.message);
+  } finally { 
+    const saveBtn = $("saveBtn"); 
+    if (saveBtn) { 
+      saveBtn.disabled = false; 
+      saveBtn.innerText = "حفظ"; 
+    } 
+  }
 };
 
 window.editSlotData = async function(slotId) { const slot = cache.find(s => s.id === slotId); if (!slot) return; const name = prompt("تعديل الاسم:", slot.patient?.name || ""); if (name === null) return; const phone = prompt("تعديل الهاتف:", slot.patient?.phone || ""); if (phone === null) return; const notes = prompt("تعديل الملاحظات:", slot.patient?.notes || ""); if (notes === null) return; const paid = prompt("تعديل المبلغ:", slot.paid || 0); if (paid === null) return; const status = prompt("تعديل الحالة:", slot.status || "حجز"); if (status === null) return; try { await updateDoc(doc(db, "slots", slotId), { patient: { name: name || "", phone: phone || "", notes: notes || "" }, paid: Number(paid) || 0, status: status || "حجز", updatedAt: serverTimestamp() }); showAdminNotification("✅ تم التعديل"); } catch (err) { alert("❌ فشل: " + err.message); } };
