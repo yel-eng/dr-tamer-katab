@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title id="page-title">[اسم_العيادة]</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+body{background:var(--bg);color:var(--dark);transition:background 0.3s,color 0.3s;opacity:0;visibility:hidden;overflow-x:hidden}
+body.loaded{opacity:1;visibility:visible;transition:opacity 0.5s ease-in}
+:root{--primary:#1d4ed8;--dark:#0f172a;--bg:#f8fafc;--card:#ffffff;--muted:#64748b}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Tajawal',sans-serif}
+.login-btn{position:fixed;top:20px;right:20px;left:auto;z-index:10000;background:linear-gradient(135deg,var(--primary),#1e40af);color:#fff;border:none;padding:10px 20px;font-size:14px;border-radius:10px;cursor:pointer;transition:0.3s;text-decoration:none;box-shadow:0 4px 10px rgba(0,0,0,0.2)}
+.login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 15px rgba(0,0,0,0.3)}
+.menu-toggle{display:none;position:fixed;top:15px;right:15px;z-index:10001;background:#fff;color:var(--primary);border:2px solid var(--primary);width:44px;height:44px;border-radius:10px;font-size:20px;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+.hero{position:relative;padding:70px 8%;background:linear-gradient(135deg,#e0f2fe,#ffffff);min-height:90vh;display:flex;align-items:center;overflow:hidden}
+.hero-bg-layer{position:absolute;top:0;left:0;right:0;bottom:0;background-size:cover;background-position:center;background-repeat:no-repeat;opacity:0.08;z-index:0;pointer-events:none}
+.hero>*:not(.hero-bg-layer):not(.navbar){position:relative;z-index:2}
+.navbar{position:absolute;top:20px;left:50%;transform:translateX(-50%);background:#fff;padding:12px 20px;border-radius:50px;display:flex;gap:20px;box-shadow:0 10px 30px rgba(0,0,0,0.08);flex-wrap:wrap;justify-content:center;z-index:100}
+.navbar a{text-decoration:none;color:var(--dark);font-weight:500;font-size:14px;padding:5px 10px}
+.hero-content{display:flex;width:100%;justify-content:space-between;align-items:center;gap:40px;flex-wrap:wrap}
+.hero-text{flex:1;max-width:520px;text-align:center}
+.hero-text h1{font-size:42px;margin-bottom:10px;color:var(--primary)}
+.hero-text p{color:var(--muted);line-height:1.9;font-size:16px;margin-bottom:20px}
+.hero-img{flex:1;display:flex;justify-content:center}
+.hero-img img{width:280px;border-radius:20px}
+.wa{position:fixed;bottom:20px;right:20px;background:#25d366;color:#fff;width:55px;height:55px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:25px;padding:60px 8%}
+.card{background:#fff;border-radius:20px;border:1px solid #eee;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;text-align:center;font-size:18px;font-weight:500;transition:0.3s;flex-direction:column;padding:15px}
+.card .icon{font-size:40px;margin-bottom:10px}
+.card:hover{transform:translateY(-8px);box-shadow:0 20px 40px rgba(0,0,0,0.08)}
+.doctor{display:flex;align-items:center;justify-content:center;gap:30px;padding:60px 8%;flex-wrap:wrap}
+.doctor>div{flex:1;max-width:450px}
+.doctor img{width:280px;border-radius:20px}
+.gallery{position:relative;padding:40px 8%;overflow:hidden}
+.gallery-track{display:flex;gap:15px;animation:scroll 30s linear infinite;width:max-content}
+.gallery-track:hover{animation-play-state:paused}
+@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.gallery img{width:250px;border-radius:15px;flex-shrink:0}
+.media{padding:50px 8%}
+.media-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px}
+.cta{margin:60px 8%;border-radius:25px;background:linear-gradient(135deg,var(--primary),#1e40af);color:#fff;padding:40px;position:relative;overflow:hidden}
+.cta-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+.cta-text h2{font-size:28px;margin-bottom:10px}
+.cta-text p{opacity:0.9;line-height:1.8}
+.cta-buttons{margin-top:20px;display:flex;gap:15px;flex-wrap:wrap}
+.call-btn,.wa-btn{background:#fff;color:var(--primary);padding:12px 20px;border-radius:12px;text-decoration:none;font-weight:500}
+.wa-btn{background:#25d366;color:#fff}
+.cta-badge{background:#fff;color:var(--primary);padding:10px 18px;border-radius:50px;font-weight:600}
+.contact{padding:50px 8%}
+.contact-box{background:#fff;padding:20px;border-radius:15px;border:1px solid #eee}
+.map{padding:40px 8%}
+.map iframe{width:100%;height:350px;border-radius:20px;border:0}
+footer{text-align:center;padding:20px;color:#64748b}
+.book-btn{background:var(--primary);color:#fff;padding:12px 22px;border:none;border-radius:12px;font-size:15px;cursor:pointer;transition:0.3s}
+.book-btn:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(0,0,0,0.1)}
+.section-hidden{display:none!important}
+.mobile-menu{display:none;position:fixed;top:70px;right:15px;background:#fff;padding:15px;border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,0.15);z-index:1000;min-width:200px;flex-direction:column;gap:8px}
+.mobile-menu.active{display:flex}
+.mobile-menu a{text-decoration:none;color:var(--dark);font-weight:500;font-size:14px;padding:10px 15px;border-radius:8px;transition:0.2s}
+.mobile-menu a:hover{background:#f1f5f9;color:var(--primary)}
+@media(max-width:767px){
+.navbar{display:none}.menu-toggle{display:flex}.hero{padding:80px 5% 40px;min-height:auto}.hero-content{flex-direction:column;text-align:center}
+.hero-text h1{font-size:32px}.hero-text p{font-size:15px}.hero-img img{width:240px}.cards{grid-template-columns:1fr;padding:40px 5%}
+.doctor{flex-direction:column;text-align:center;padding:40px 5%}.doctor img{width:220px}.gallery{padding:30px 5%}
+.gallery-track{gap:12px}.gallery img{width:200px;height:150px}.media{padding:40px 5%}.media-grid{grid-template-columns:1fr}
+.cta{margin:40px 5%;padding:30px 20px}.cta-content{flex-direction:column;text-align:center}.cta-text h2{font-size:24px}
+.cta-buttons{justify-content:center}.contact{padding:40px 5%}.map{padding:30px 5%}.map iframe{height:250px}
+.wa{width:50px;height:50px;font-size:22px;bottom:15px;right:15px}.login-btn{top:15px!important;left:15px!important;right:auto!important;padding:6px 12px;font-size:12px;border-radius:8px}
+}
+@media(max-width:480px){.hero-text h1{font-size:28px}.hero-img img{width:200px}.book-btn{padding:12px 24px;font-size:14px}.card{font-size:16px}.card .icon{font-size:36px}.doctor img{width:180px}.gallery img{width:160px;height:120px}.cta{padding:25px 15px}.call-btn,.wa-btn{width:100%;text-align:center}}
+</style>
+</head>
+<body>
+<button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
+<div class="mobile-menu" id="mobileMenu"></div>
+<section class="hero" id="hero-section">
+<div class="hero-bg-layer" id="heroBgLayer"></div>
+<nav class="navbar" id="navbar"></nav>
+<div class="hero-content">
+<div class="hero-text">
+<h1 data-setting="hero_title">[اسم_الطبيب] - [اسم_العيادة]</h1>
+<p data-setting="hero_desc">رعاية طبية متميزة</p>
+<button onclick="location.href='booking.html'" class="book-btn">احجز الآن</button>
+</div>
+<div class="hero-img"><img src="" id="hero-image" alt="[اسم_الطبيب]"></div>
+</div>
+</section>
+<section class="cards" id="cards-section"></section>
+<section class="doctor" id="doctor">
+<div><h2 data-setting="about_heading">عن الدكتور</h2><p><span data-setting="doctor_name">[اسم_الطبيب]</span> - <span data-setting="doctor_title">التخصص</span></p><p data-setting="about_text">نبذة مختصرة عن الخبرة والخدمات.</p></div>
+<img src="" id="doctor-image" alt="صورة الطبيب">
+</section>
+<section class="gallery" id="gallery-section"><div class="gallery-track" id="gallery-track"></div></section>
+<section class="media" id="media"><h2 style="text-align:center;margin-bottom:20px;">المكتبة الطبية</h2><h3 style="margin:25px 0 15px;">📸 صور</h3><div class="media-grid" id="imagesContainer"></div><h3 style="margin:25px 0 15px;">🎥 فيديوهات</h3><div class="media-grid" id="videosContainer"></div><h3 style="margin:25px 0 15px;">📄 مقالات</h3><div class="media-grid" id="articlesContainer"></div></section>
+<div class="cta" id="cta-section"><div class="cta-content"><div class="cta-text"><h2 data-setting="cta_title">استشارة مجانية لأول مرة 🎯</h2><p data-setting="cta_desc">احجز الآن – الأماكن محدودة</p><p data-setting="working_hours">مواعيد العمل</p><div class="cta-buttons"><a href="" id="phone-link" class="call-btn">📞 اتصل الآن</a><a href="" id="whatsapp-link" class="wa-btn"><i class="fab fa-whatsapp"></i> واتساب</a></div></div><div class="cta-badge" data-setting="cta_badge">🔥 عرض محدود</div></div></div>
+<section class="contact" id="contact"><div class="contact-box"><h2 data-setting="contact_heading">عنوان العيادة</h2><p><span data-setting="address">المدينة، المنطقة</span></p><p data-setting="contact_note" style="margin-top:10px;color:var(--muted);">اتصال مباشر</p></div></section>
+<section class="map" id="map-section"><iframe id="map-frame" src="" allowfullscreen loading="lazy"></iframe></section>
+<footer id="footer-text">© 2024 [اسم_العيادة] - جميع الحقوق محفوظة</footer>
+<a class="wa" id="wa-float" href=""><i class="fab fa-whatsapp"></i></a>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { firebaseConfig } from "./firebase-config.js";
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+window.toggleMobileMenu = function() { document.getElementById('mobileMenu').classList.toggle('active'); };
+async function loadAndApplySettings() {
+try {
+const settingsDoc = await getDoc(doc(db, "settings_mona", "main"));
+if (!settingsDoc.exists()) { applyDefaults(); return; }
+const s = settingsDoc.data();
+if (s.primary_color) { document.documentElement.style.setProperty('--primary', s.primary_color); document.documentElement.style.setProperty('--primary-dark', s.primary_color + 'dd'); }
+if (s.bg_color) document.documentElement.style.setProperty('--bg', s.bg_color);
+if (s.clinic_name) { document.title = s.clinic_name; }
+if (s.doctor_name) document.querySelectorAll('[data-setting="doctor_name"]').forEach(el => el.textContent = s.doctor_name);
+if (s.doctor_title) document.querySelectorAll('[data-setting="doctor_title"]').forEach(el => el.textContent = s.doctor_title);
+var el;
+if (s.hero_title && (el=document.querySelector('[data-setting="hero_title"]'))) el.textContent = s.hero_title;
+if (s.hero_desc && (el=document.querySelector('[data-setting="hero_desc"]'))) el.textContent = s.hero_desc;
+if (s.about_heading && (el=document.querySelector('[data-setting="about_heading"]'))) el.textContent = s.about_heading;
+if (s.about_text && (el=document.querySelector('[data-setting="about_text"]'))) el.textContent = s.about_text;
+var ctaTitle = (s.cta && s.cta.title) ? s.cta.title : (s.cta_title || "");
+var ctaDesc = (s.cta && s.cta.desc) ? s.cta.desc : (s.cta_desc || "");
+var ctaHours = (s.cta && s.cta.working_hours) ? s.cta.working_hours : (s.working_hours || "");
+var ctaBadge = (s.cta && s.cta.badge) ? s.cta.badge : (s.cta_badge || "");
+if (ctaTitle && (el=document.querySelector('[data-setting="cta_title"]'))) el.textContent = ctaTitle;
+if (ctaDesc && (el=document.querySelector('[data-setting="cta_desc"]'))) el.textContent = ctaDesc;
+if (ctaHours && (el=document.querySelector('[data-setting="working_hours"]'))) el.innerHTML = ctaHours;
+if (ctaBadge && (el=document.querySelector('[data-setting="cta_badge"]'))) el.textContent = ctaBadge;
+if (s.address && (el=document.querySelector('[data-setting="address"]'))) el.textContent = s.address;
+if (s.contact_note && (el=document.querySelector('[data-setting="contact_note"]'))) el.textContent = s.contact_note;
+if (s.footer_text) document.getElementById('footer-text').textContent = s.footer_text;
+if (s.hero_image) document.getElementById('hero-image').src = s.hero_image;
+if (s.doctor_image) document.getElementById('doctor-image').src = s.doctor_image;
+if (s.phone_number) document.getElementById('phone-link').href = "tel:" + s.phone_number;
+if (s.whatsapp_number) {
+var waNum = s.whatsapp_number.replace(/^0+/,'').replace(/\s/g,'');
+var fullWa = waNum.startsWith('20') ? waNum : '20' + waNum;
+document.getElementById('whatsapp-link').href = "https://wa.me/" + fullWa;
+document.getElementById('wa-float').href = "https://wa.me/" + fullWa;
+}
+if (s.map_url) document.getElementById('map-frame').src = s.map_url;
+if (s.hero_bg) { var bgLayer = document.getElementById('heroBgLayer'); if (bgLayer) { bgLayer.style.backgroundImage = `url('${s.hero_bg}')`; } }
+if (s.navbar_links && s.navbar_links.length > 0) {
+var navbar = document.getElementById('navbar'); navbar.innerHTML = "";
+var mobileMenu = document.getElementById('mobileMenu'); if (mobileMenu) mobileMenu.innerHTML = "";
+for (var i = 0; i < s.navbar_links.length; i++) { var link = s.navbar_links[i]; if (link.visible) { navbar.innerHTML += '<a href="' + link.href + '">' + link.text + '</a>'; if (mobileMenu) mobileMenu.innerHTML += '<a href="' + link.href + '">' + link.text + '</a>'; } }
+}
+if (s.cards && s.cards.length > 0) { var cardsSection = document.getElementById('cards-section'); cardsSection.innerHTML = ""; for (var i = 0; i < s.cards.length; i++) { var card = s.cards[i]; if (card.visible) cardsSection.innerHTML += '<div class="card"><div class="icon">' + card.icon + '</div><h3>' + card.title + '</h3></div>'; } }
+if (s.gallery_images && s.gallery_images.length > 0) { var track = document.getElementById('gallery-track'); var imagesHtml = ""; for (var i = 0; i < s.gallery_images.length; i++) imagesHtml += '<img src="' + s.gallery_images[i] + '" alt="صورة" loading="lazy" onerror="this.src=\'https://via.placeholder.com/250x200?text=Image\'">"; track.innerHTML = imagesHtml + imagesHtml; if (s.gallery_auto_scroll !== false) { track.style.animation = 'scroll 30s linear infinite'; } else { track.style.animation = 'none'; track.style.overflowX = 'auto'; track.style.padding = '10px 0'; } }
+if (s.sections) {
+if (s.sections.hero === false) document.getElementById('hero-section').classList.add('section-hidden');
+if (s.sections.cards === false) document.getElementById('cards-section').classList.add('section-hidden');
+if (s.sections.doctor === false) document.getElementById('doctor').classList.add('section-hidden');
+if (s.sections.gallery === false) document.getElementById('gallery-section').classList.add('section-hidden');
+if (s.sections.media === false) document.getElementById('media').classList.add('section-hidden');
+if (s.sections.cta === false) document.getElementById('cta-section').classList.add('section-hidden');
+if (s.sections.contact === false) document.getElementById('contact').classList.add('section-hidden');
+if (s.sections.map === false) document.getElementById('map-section').classList.add('section-hidden');
+if (s.sections.footer === false) { var footerEl = document.getElementById('footer-text'); if (footerEl && footerEl.parentElement) footerEl.parentElement.classList.add('section-hidden'); }
+}
+} catch (err) { console.warn("⚠️ Failed to load settings:", err); applyDefaults(); } finally { document.body.classList.add('loaded'); }
+}
+function applyDefaults() { document.documentElement.style.setProperty('--primary', '#1d4ed8'); document.documentElement.style.setProperty('--bg', '#f8fafc'); document.getElementById('hero-image').src = "https://via.placeholder.com/320?text=Doctor"; document.getElementById('doctor-image').src = "https://via.placeholder.com/320?text=Doctor"; document.getElementById('phone-link').href = "tel:01xxxxxxxxx"; document.getElementById('whatsapp-link').href = "https://wa.me/201xxxxxxxxx"; document.getElementById('wa-float').href = "https://wa.me/201xxxxxxxxx"; document.getElementById('map-frame').src = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d109143.5476075848!2d29.85589339887508!3d31.21564550000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14f5c50223400001%3A0x500c3b4e7c186c0!2sAlexandria%2C%20Alexandria%20Governorate!5e0!3m2!1sen!2seg!4v1689898989898!5m2!1sen!2seg"; var navbar = document.getElementById('navbar'); navbar.innerHTML = '<a href="#">الرئيسية</a><a href="#doctor">عن الطبيب</a><a href="#media">المكتبة</a><a href="#contact">تواصل</a>'; var mobileMenu = document.getElementById('mobileMenu'); if (mobileMenu) mobileMenu.innerHTML = '<a href="#">الرئيسية</a><a href="#doctor">عن الطبيب</a><a href="#media">المكتبة</a><a href="#contact">تواصل</a>'; var cardsSection = document.getElementById('cards-section'); cardsSection.innerHTML = '<div class="card"><div class="icon">⭐</div><h3>رعاية متميزة</h3></div><div class="card"><div class="icon">🧠</div><h3>أحدث التقنيات</h3></div><div class="card"><div class="icon">❤️</div><h3>اهتمام شخصي</h3></div>'; document.body.classList.add('loaded'); }
+async function loadMediaContent() { try { const snapshot = await getDocs(collection(db, "content_mona")); const imagesContainer = document.getElementById("imagesContainer"); const videosContainer = document.getElementById("videosContainer"); const articlesContainer = document.getElementById("articlesContainer"); imagesContainer.innerHTML = ""; videosContainer.innerHTML = ""; articlesContainer.innerHTML = ""; snapshot.forEach((docSnap) => { const item = docSnap.data(); if (item.type === "image") imagesContainer.innerHTML += '<div class="card"><img src="' + item.link + '" style="width:100%;border-radius:10px" loading="lazy" onerror="this.src=\'https://via.placeholder.com/300x200?text=Image\'"></div>'; if (item.type === "video") videosContainer.innerHTML += '<div class="card"><video controls style="width:100%" loading="lazy"><source src="' + item.link + '"></video></div>'; if (item.type === "article") articlesContainer.innerHTML += '<div class="card"><h3>' + item.title + '</h3><p style="font-size:13px;color:var(--muted);margin-top:8px;">' + item.desc + '</p></div>'; }); } catch (err) { console.warn("⚠️ Failed to load media content:", err); } }
+if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", function() { loadAndApplySettings(); loadMediaContent(); }); } else { loadAndApplySettings(); loadMediaContent(); }
+document.addEventListener('click', function(e) { if (e.target.closest('.mobile-menu a')) { document.getElementById('mobileMenu').classList.remove('active'); } });
+</script>
+</body>
+</html>
