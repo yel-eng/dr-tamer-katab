@@ -169,7 +169,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);pad
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, deleteDoc, addDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 /* =========================
@@ -214,13 +214,12 @@ onAuthStateChanged(auth, (user) => {
 window.toggleMenu = () => $("sideNav").classList.toggle("open");
 window.logout = () => signOut(auth).then(() => location.href = "login.html");
 
-// ✅ تحميل المرضى - متوافق مع createdAt (camelCase) كما في admin.html
+// ✅ تحميل المرضى - متوافق مع createdAt (camelCase)
 async function loadPatients() {
   try {
     $("patientsList").innerHTML = '<div class="loading-state">⏳ جاري التحميل...</div>';
     
     let snap;
-    // ✅ نجرب createdAt أولاً (المستخدم في admin.html)، ثم بدون ترتيب
     try { 
       const q = query(patientsRef, orderBy("createdAt", "desc")); 
       snap = await getDocs(q); 
@@ -232,11 +231,9 @@ async function loadPatients() {
     patientsCache = [];
     snap.forEach(d => {
       const data = d.data();
-      // ✅ توحيد اسم حقل التاريخ عشان التوافق
       data._ts = data.createdAt || data.updatedAt || data.created_at;
       
       const sessions = data.sessions || [];
-      // ✅ حساب نوع المريض تلقائياً لو مش موجود
       if (!data.type) {
         if (sessions.length >= 5) data.type = "vip";
         else if (sessions.length >= 2) data.type = "regular";
@@ -245,15 +242,12 @@ async function loadPatients() {
       patientsCache.push({ id: d.id, ...data });
     });
 
-    // ✅ ترتيب يدوي لو فشل orderBy
     if (!snap.docs[0]?.data()?.createdAt) {
       patientsCache.sort((a, b) => (b._ts?.seconds || 0) - (a._ts?.seconds || 0));
     }
     
     renderPatients(patientsCache);
     $("patientsCount").textContent = `${patientsCache.length} مريض`;
-    
-    // ✅ معالجة الفتح التلقائي من الرابط (من admin.html)
     handleAutoOpenFromUrl();
     
     if (patientsCache.length === 0) {
@@ -265,7 +259,6 @@ async function loadPatients() {
   }
 }
 
-// ✅ عرض قائمة المرضى
 function renderPatients(list) {
   const container = $("patientsList");
   if (!list || list.length === 0) return;
@@ -298,7 +291,6 @@ function renderPatients(list) {
   }).join("");
 }
 
-// ✅ تطبيق الفلتر والبحث أونلاين
 window.applyOnlineFilter = async function() {
   const search = $("searchInput").value.trim().toLowerCase();
   const type = $("filterType").value;
@@ -355,7 +347,6 @@ window.debouncedFilter = function() {
   filterTimeout = setTimeout(() => { applyOnlineFilter(); }, 500);
 };
 
-// ✅ فتح مودال المريض للعرض/التعديل
 window.openPatientModal = async function(id) {
   try {
     const snap = await getDoc(doc(db, "patients", id));
@@ -363,7 +354,6 @@ window.openPatientModal = async function(id) {
     
     const p = snap.data();
     
-    // ✅ ملء الحقول
     $("modalPatientId").value = id;
     $("modalName").value = p.name || "";
     $("modalPhone").value = p.phone || "";
@@ -371,7 +361,6 @@ window.openPatientModal = async function(id) {
     $("modalType").value = p.type || "new";
     $("modalNotes").value = p.notes || "";
     
-    // ✅ عرض الجلسات (يدعم note و notes للتوافق)
     const sessions = p.sessions || [];
     $("sessionsCount").textContent = `(${sessions.length})`;
     
@@ -393,13 +382,11 @@ window.openPatientModal = async function(id) {
       `).join("");
     }
     
-    // ✅ تجهيز فورم إضافة جلسة جديدة
     $("newSessionDate").value = new Date().toISOString().split("T")[0];
     $("newSessionTime").value = "";
     $("newSessionNote").value = "";
     $("newSessionPaid").value = "";
     
-    // ✅ عرض المودال
     $("patientModal").style.display = "flex";
     
   } catch (err) { 
@@ -412,7 +399,6 @@ window.closeModal = function() {
   $("patientModal").style.display = "none"; 
 };
 
-// ✅ حفظ تعديلات المريض
 window.savePatient = async function() {
   const id = $("modalPatientId").value;
   if (!id) return;
@@ -424,7 +410,7 @@ window.savePatient = async function() {
       age: $("modalAge").value.trim(), 
       type: $("modalType").value,
       notes: $("modalNotes").value.trim(), 
-      updatedAt: serverTimestamp()  // ✅ camelCase للتوافق
+      updatedAt: serverTimestamp()
     });
     showToast("✅ تم حفظ التعديلات"); 
     closeModal(); 
@@ -435,7 +421,7 @@ window.savePatient = async function() {
   }
 };
 
-// ✅ إضافة جلسة جديدة لمريض
+// ✅ ✅ ✅ دالة addSession المُصححة: باستخدام new Date() بدل serverTimestamp() داخل المصفوفة
 window.addSession = async function() {
   const id = $("modalPatientId").value;
   const date = $("newSessionDate").value;
@@ -448,22 +434,22 @@ window.addSession = async function() {
     const p = snap.data();
     const sessions = p.sessions || [];
     
-    // ✅ إضافة الجلسة الجديدة باستخدام 'note' (مفرد) للتوافق مع admin.html
+    // ✅ استخدام new Date() بدل serverTimestamp() (لأن فايربيس لا يدعمه داخل المصفوفات)
     sessions.push({ 
       date, 
       time: $("newSessionTime").value, 
-      note: $("newSessionNote").value.trim(),  // ✅ note مفرد
+      note: $("newSessionNote").value.trim(),
       paid: $("newSessionPaid").value ? Number($("newSessionPaid").value) : null, 
-      createdAt: serverTimestamp()  // ✅ camelCase
+      createdAt: new Date()  // ✅ ✅ ✅ هذا هو التصحيح المطلوب
     });
     
     await updateDoc(patientRef, { 
       sessions, 
-      updatedAt: serverTimestamp() 
+      updatedAt: serverTimestamp()  // ✅ هذا بره المصفوفة فمسموح
     });
     
     showToast("✅ تم إضافة الجلسة"); 
-    openPatientModal(id);  // إعادة تحميل المودال
+    openPatientModal(id);
     
   } catch (err) { 
     console.error("❌ Add session error:", err);
@@ -471,7 +457,6 @@ window.addSession = async function() {
   }
 };
 
-// ✅ حذف جلسة من سجل المريض
 window.deleteSession = async function(patientId, sessionIndex) {
   if (!confirm("⚠️ هل تريد حذف هذه الجلسة نهائياً؟")) return;
   
@@ -497,12 +482,10 @@ window.deleteSession = async function(patientId, sessionIndex) {
   }
 };
 
-// ✅ تحرير سريع (يفتح المودال)
 window.quickEdit = async function(id) { 
   openPatientModal(id); 
 };
 
-// ✅ حذف مريض نهائياً
 window.deletePatient = async function(id) {
   if (!confirm("⚠️ حذف ملف المريض نهائياً؟ لا يمكن التراجع عن هذا الإجراء!")) return;
   
@@ -516,7 +499,6 @@ window.deletePatient = async function(id) {
   }
 };
 
-// ✅ فتح واتساب للمريض
 window.openWhatsApp = function(phone) {
   if (!phone) return showToast("⚠️ لا يوجد رقم هاتف", "error");
   
@@ -524,13 +506,11 @@ window.openWhatsApp = function(phone) {
   window.open(`https://wa.me/${wa}?text=${encodeURIComponent("مرحباً د. تامر، بخصوص موعدك...")}`, "_blank");
 };
 
-// ✅ فتح واتساب من داخل المودال
 window.openWhatsAppFromModal = function() {
   const phone = $("modalPhone").value.trim();
   openWhatsApp(phone);
 };
 
-// ✅ تصدير قائمة المرضى لـ CSV (مفتوح بـ Excel)
 window.exportPatients = async function() {
   try {
     $("patientsList").innerHTML = '<div class="loading-state">📥 جاري التصدير...</div>';
@@ -570,7 +550,6 @@ window.exportPatients = async function() {
   }
 };
 
-// ✅ عرض رسالة منبثقة
 function showToast(msg, type = "success") {
   const toast = document.createElement("div"); 
   toast.className = `toast ${type === "error" ? "error" : ""}`;
@@ -579,12 +558,10 @@ function showToast(msg, type = "success") {
   setTimeout(() => toast.remove(), 4000);
 }
 
-// ✅ إغلاق المودال عند الضغط خارجه
 $("patientModal")?.addEventListener("click", (e) => { 
   if (e.target === $("patientModal")) closeModal(); 
 });
 
-// ✅ تنظيف رقم الهاتف للتوافق مع واتساب و admin.html
 function cleanPhone(phone) { 
   if (!phone) return ""; 
   let p = String(phone).replace(/[^0-9]/g, ''); 
@@ -592,7 +569,6 @@ function cleanPhone(phone) {
   return p.startsWith('20') ? p : '20' + p; 
 }
 
-// ✅ الفتح التلقائي للمريض من رابط (من admin.html عند الضغط على 💾)
 async function handleAutoOpenFromUrl() {
   const params = new URLSearchParams(window.location.search);
   const autoOpen = params.get('autoOpen');
@@ -604,7 +580,6 @@ async function handleAutoOpenFromUrl() {
       try {
         let targetPatient = null;
         
-        // ✅ أولاً: نجرب البحث بـ PID لو موجود
         if (pidParam) { 
           const snap = await getDoc(doc(db, "patients", pidParam)); 
           if (snap.exists()) {
@@ -612,16 +587,13 @@ async function handleAutoOpenFromUrl() {
           }
         }
         
-        // ✅ ثانياً: لو مفيش، نجرب البحث بالهاتف
         if (!targetPatient && phoneParam) {
           const fullPhone = cleanPhone(phoneParam);
           targetPatient = patientsCache.find(p => cleanPhone(p.phone || "") === fullPhone) || null;
         }
         
-        // ✅ لو لاقينا المريض، نفتح المودال
         if (targetPatient) {
           await openPatientModal(targetPatient.id);
-          // ✅ تنظيف الرابط عشان ما يفتحش تاني عند الريفرش
           window.history.replaceState({}, document.title, window.location.pathname);
           showToast("📋 تم فتح ملف: " + (targetPatient.name || "مريض"));
         }
@@ -632,7 +604,6 @@ async function handleAutoOpenFromUrl() {
   }
 }
 
-// ✅ بدء التحميل عند تحميل الصفحة
 console.log("✅ Patients Page Loaded - dr-tamer-khatab Connected");
 </script>
 </body>
