@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚙️ إدارة الموقع - عيادة الدكتور تامر خطاب</title>
+<style>
+:root{--main:#1a237e;--main-light:#3949ab;--bg:#f4f7f6;--white:#fff;--text:#333;--text-light:#64748b;--danger:#ef4444;--success:#22c55e;--warning:#f59e0b;--radius:14px;--shadow:0 4px 16px rgba(0,0,0,0.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);padding:20px;margin-right:235px;line-height:1.6}
+
+/* Sidebar */
+.side-nav{position:fixed;top:0;right:0;width:235px;height:100vh;background:linear-gradient(180deg,var(--main),var(--main-light));padding:25px 15px;display:flex;flex-direction:column;gap:10px;z-index:999;box-shadow:-5px 0 20px rgba(0,0,0,0.2)}
+.side-nav .logo{color:#fff;text-align:center;margin:10px 0 25px;font-size:17px;font-weight:bold;line-height:1.4}
+.side-nav a.active{background:var(--white);color:var(--main);font-weight:bold}
+.side-nav a.disabled{opacity:0.5;pointer-events:none}
+.side-nav a{text-decoration:none;color:#fff;padding:12px;border-radius:10px;transition:0.3s;font-size:14px;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.side-nav a:hover{background:rgba(255,255,255,0.15)}
+.side-nav .logout-btn{margin-top:auto;background:#ef4444;color:#fff;border:none;padding:12px;border-radius:10px;cursor:pointer;font-size:14px;display:flex;align-items:center;gap:8px;transition:0.2s}
+.side-nav .logout-btn:hover{background:#dc2626}
+
+/* Main Content */
+.main-content{padding:25px;width:100%}
+.page-header{background:linear-gradient(180deg,#1e3a8a,#1d4ed8);color:#fff;padding:20px 25px;border-radius:var(--radius);margin-bottom:25px;display:flex;justify-content:space-between;align-items:center}
+.page-header h2{font-size:18px;display:flex;align-items:center;gap:8px}
+
+/* Tabs */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:25px;background:var(--white);padding:10px;border-radius:var(--radius);box-shadow:var(--shadow)}
+.tab-btn{padding:10px 16px;border:none;background:transparent;border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;transition:0.2s;color:var(--text);display:flex;align-items:center;gap:6px}
+.tab-btn:hover{background:#f1f5f9}
+.tab-btn.active{background:var(--main);color:#fff}
+
+/* Tab Content */
+.tab-content{display:none;background:var(--white);padding:25px;border-radius:var(--radius);box-shadow:var(--shadow)}
+.tab-content.active{display:block}
+
+/* Forms */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.form-group{margin-bottom:15px}
+.form-group label{display:block;font-size:13px;color:var(--text-light);margin-bottom:6px;font-weight:500}
+input,textarea,select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #e5e7eb;background:#fff;font-size:14px;transition:0.25s}
+input:hover,textarea:hover,select:hover{border-color:#cbd5f5}
+input:focus,textarea:focus,select:focus{border-color:var(--main);box-shadow:0 0 0 3px rgba(26,35,126,0.15);outline:none}
+textarea{min-height:90px;resize:vertical}
+
+/* Buttons */
+.btn{background:var(--main);color:#fff;border:none;padding:12px 20px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:500;transition:0.2s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--main-light);transform:translateY(-2px)}
+.btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+.btn-success{background:var(--success)}
+.btn-success:hover{background:#16a34a}
+.btn-danger{background:var(--danger)}
+.btn-danger:hover{background:#dc2626}
+.btn-warning{background:var(--warning);color:#000}
+.btn-warning:hover{background:#d97706}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:8px}
+.btn-icon{width:36px;height:36px;padding:0;border-radius:8px;display:flex;align-items:center;justify-content:center}
+
+/* Login Box */
+.login-box{max-width:400px;margin:50px auto;background:var(--white);padding:30px;border-radius:var(--radius);box-shadow:var(--shadow);text-align:center}
+.login-box h3{color:var(--main);margin-bottom:20px}
+.login-box input{margin-bottom:12px}
+
+/* Lists & Items */
+.items-list{display:flex;flex-direction:column;gap:12px;max-height:400px;overflow-y:auto}
+.list-item{background:#f8fafc;padding:15px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;border-right:3px solid var(--main)}
+.list-item .actions{display:flex;gap:6px}
+.list-item .actions button{border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:11px}
+
+/* Cards Preview */
+.cards-preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:15px;margin-top:15px}
+.card-preview{background:linear-gradient(180deg,#fff,#f8fafc);padding:15px;border-radius:12px;border:1px solid #eef2f7;text-align:center}
+.card-preview img{width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:10px}
+.card-preview h4{font-size:14px;margin:5px 0;color:#0f172a}
+.card-preview p{font-size:12px;color:var(--text-light)}
+
+/* Gallery Grid */
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:15px}
+.gallery-item{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:1}
+.gallery-item img{width:100%;height:100%;object-fit:cover;transition:0.3s}
+.gallery-item:hover img{transform:scale(1.05)}
+.gallery-item .overlay{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);color:#fff;padding:8px;font-size:11px;display:flex;justify-content:space-between}
+.gallery-item .overlay button{background:none;border:none;color:#fff;cursor:pointer;font-size:14px}
+
+/* Toggle Switch */
+.toggle{position:relative;display:inline-block;width:48px;height:26px}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#cbd5e1;border-radius:26px;transition:0.3s}
+.toggle-slider:before{position:absolute;content:"";height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:0.3s}
+input:checked + .toggle-slider{background:var(--success)}
+input:checked + .toggle-slider:before{transform:translateX(22px)}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--success);color:#fff;padding:14px 24px;border-radius:12px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,0.2);z-index:10000;animation:slideIn 0.3s ease, fadeOut 0.3s ease 3.7s forwards}
+.toast.error{background:var(--danger)}
+@keyframes slideIn{from{transform:translateX(-50%) translateY(100px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+
+/* Responsive */
+@media(max-width:900px){
+  body{margin-right:0;padding:15px}
+  .side-nav{right:-235px;transition:right 0.3s}
+  .side-nav.open{right:0}
+  .main-content{margin-right:0}
+  .menu-toggle{display:flex!important}
+  .form-grid{grid-template-columns:1fr}
+}
+.menu-toggle{display:none;position:fixed;top:15px;right:15px;z-index:1000;background:var(--main);color:#fff;border:none;width:44px;height:44px;border-radius:10px;font-size:20px;cursor:pointer}
+
+/* Hidden Sections */
+.section-hidden{opacity:0.6;pointer-events:none}
+</style>
+</head>
+<body>
+
+<!-- Mobile Menu -->
+<button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+<!-- Sidebar -->
+<div class="side-nav" id="sideNav">
+  <h2 class="logo">🏥 عيادة د. تامر</h2>
+  <a href="admin.html">🏠 لوحة المواعيد</a>
+  <a href="index-admin.html" class="active">📂 إدارة الموقع</a>
+  <a href="patients.html">📋 ملفات المرضى</a>
+  <button class="logout-btn" onclick="logout()">🚪 خروج</button>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+  
+  <!-- Login View -->
+  <div id="loginView" class="login-box">
+    <h3>🔐 تسجيل الدخول مطلوب</h3>
+    <p style="margin-bottom:20px;color:var(--text-light)">عشان تقدر تحفظ الإعدادات، لازم تسجل دخول بحساب الأدمن أولاً.</p>
+    <input type="email" id="adminEmail" placeholder="البريد الإلكتروني">
+    <input type="password" id="adminPass" placeholder="كلمة المرور">
+    <button class="btn" onclick="login()" style="width:100%">🔐 تسجيل الدخول</button>
+  </div>
+
+  <!-- Admin View -->
+  <div id="adminView" style="display:none">
+    
+    <div class="page-header">
+      <h2>⚙️ إعدادات الموقع</h2>
+      <button class="btn btn-success" onclick="saveAllSettings()">💾 حفظ جميع الإعدادات</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('general')">⚙️ عام</button>
+      <button class="tab-btn" onclick="switchTab('navbar')">🔗 الناف بار</button>
+      <button class="tab-btn" onclick="switchTab('cards')">🃏 الكروت</button>
+      <button class="tab-btn" onclick="switchTab('gallery')">🖼️ الجاليري</button>
+      <button class="tab-btn" onclick="switchTab('consult')">🎯 الاستشارات</button>
+      <button class="tab-btn" onclick="switchTab('visibility')">👁️ إخفاء الأقسام</button>
+      <button class="tab-btn" onclick="switchTab('content')">📚 المحتوى</button>
+    </div>
+
+    <!-- General Settings -->
+    <div id="tab-general" class="tab-content active">
+      <h3 style="margin-bottom:20px;color:var(--main)">⚙️ إعدادات الموقع العامة</h3>
+      <div class="form-grid">
+        <div class="form-group"><label>اسم العيادة</label><input type="text" id="clinicName" placeholder="اسم العيادة"></div>
+        <div class="form-group"><label>اسم الدكتور/ة</label><input type="text" id="doctorName" placeholder="اسم الدكتور"></div>
+        <div class="form-group"><label>التخصص</label><input type="text" id="specialty" placeholder="مثال: أمراض جلدية"></div>
+        <div class="form-group"><label>اللون الرئيسي</label><input type="color" id="primaryColor" value="#1a237e"></div>
+        <div class="form-group"><label>لون الخلفية</label><input type="color" id="bgColor" value="#f4f7f6"></div>
+        <div class="form-group"><label>عنوان الهيرو</label><input type="text" id="heroTitle" placeholder="عنوان الصفحة الرئيسية"></div>
+        <div class="form-group"><label>وصف الهيرو</label><textarea id="heroDesc" placeholder="وصف مختصر"></textarea></div>
+        <div class="form-group"><label>🖼️ صورة الطبيب في الهيرو</label><input type="text" id="heroDoctorImg" placeholder="رابط الصورة"></div>
+        <div class="form-group"><label>👨‍⚕️ صورة الطبيب في قسم "عن الدكتور"</label><input type="text" id="aboutDoctorImg" placeholder="رابط الصورة"></div>
+        <div class="form-group" style="grid-column:1/-1"><label>نص "عن الدكتور"</label><textarea id="aboutDoctorText" placeholder="نبذة عن الدكتور..." style="min-height:120px"></textarea></div>
+        <div class="form-group"><label>رقم الواتساب (بدون صفر)</label><input type="tel" id="whatsappNum" placeholder="201xxxxxxxxx"></div>
+        <div class="form-group"><label>رقم الاتصال</label><input type="tel" id="phoneNum" placeholder="01xxxxxxxxx"></div>
+        <div class="form-group"><label>العنوان</label><input type="text" id="clinicAddress" placeholder="عنوان العيادة"></div>
+        <div class="form-group"><label>رابط الخريطة</label><input type="text" id="mapLink" placeholder="رابط جوجل ماب"></div>
+        <div class="form-group" style="grid-column:1/-1"><label>نص الفوتر</label><textarea id="footerText" placeholder="نص حقوق النشر... (استخدم {year} للسنة)" style="min-height:60px"></textarea></div>
+      </div>
+    </div>
+
+    <!-- Navbar Links -->
+    <div id="tab-navbar" class="tab-content">
+      <h3 style="margin-bottom:20px;color:var(--main)">🔗 روابط الناف بار</h3>
+      <div class="form-grid" style="grid-template-columns:2fr 1fr 1fr auto">
+        <div class="form-group"><label>نص الرابط</label><input type="text" id="navText" placeholder="مثال: الرئيسية"></div>
+        <div class="form-group"><label>الرابط</label><input type="text" id="navLink" placeholder="index.html"></div>
+        <div class="form-group"><label>أيقونة</label><input type="text" id="navIcon" placeholder="🏠"></div>
+        <div class="form-group" style="align-self:end"><button class="btn" onclick="addNavbarLink()">➕ إضافة</button></div>
+      </div>
+      <div id="navbarList" class="items-list"></div>
+    </div>
+
+    <!-- Cards Management -->
+    <div id="tab-cards" class="tab-content">
+      <h3 style="margin-bottom:20px;color:var(--main)">🃏 إدارة الكروت</h3>
+      <div class="form-grid">
+        <div class="form-group"><label>عنوان الكارت</label><input type="text" id="cardTitle" placeholder="عنوان الخدمة"></div>
+        <div class="form-group"><label>وصف الكارت</label><textarea id="cardDesc" placeholder="وصف مختصر"></textarea></div>
+        <div class="form-group"><label>أيقونة/صورة</label><input type="text" id="cardIcon" placeholder="رابط الأيقونة أو emoji"></div>
+        <div class="form-group" style="align-self:end"><button class="btn" onclick="addCard()">➕ إضافة كارت</button></div>
+      </div>
+      <div id="cardsList" class="cards-preview"></div>
+    </div>
+
+    <!-- Gallery Management -->
+    <div id="tab-gallery" class="tab-content">
+      <h3 style="margin-bottom:20px;color:var(--main)">🖼️ إدارة الجاليري</h3>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+        <input type="text" id="galleryImg" placeholder="رابط صورة جديدة" style="flex:1;min-width:250px">
+        <button class="btn" onclick="addGalleryItem()">➕ إضافة للجاليري</button>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px">
+          <label class="toggle"><input type="checkbox" id="galleryAutoScroll"><span class="toggle-slider"></span></label>
+          تفعيل التمرير التلقائي
+        </label>
+      </div>
+      <div id="galleryList" class="gallery-grid"></div>
+    </div>
+
+    <!-- Consultations Section -->
+    <div id="tab-consult" class="tab-content">
+      <h3 style="margin-bottom:20px;color:var(--main)">🎯 قسم الاستشارات</h3>
+      <div class="form-grid">
+        <div class="form-group"><label>العنوان</label><input type="text" id="consultTitle" placeholder="عنوان القسم"></div>
+        <div class="form-group"><label>الوصف</label><textarea id="consultDesc" placeholder="وصف خدمات الاستشارة"></textarea></div>
+        <div class="form-group"><label>مواعيد العمل</label><input type="text" id="consultHours" placeholder="مثال: يومياً 5م - 10م"></div>
+        <div class="form-group"><label>البادج</label><input type="text" id="consultBadge" placeholder="مثال: متاح الآن"></div>
+        <div class="form-group" style="display:flex;align-items:center;gap:10px">
+          <label class="toggle"><input type="checkbox" id="consultShow"><span class="toggle-slider"></span></label>
+          <label>إظهار القسم في الموقع</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sections Visibility -->
+    <div id="tab-visibility" class="tab-content">
+      <h3 style="margin-bottom:20px;color:var(--main)">👁️ التحكم في ظهور الأقسام</h3>
+      <div class="items-list">
+        <div class="list-item"><span>🏠 قسم الهيرو</span><label class="toggle"><input type="checkbox" id="showHero" checked><span class="toggle-slider"></span></label></div>
+        <div class="list-item"><span>👨‍⚕️ قسم عن الدكتور</span><label class="toggle"><input type="checkbox" id="showAbout" checked><span class="toggle-slider"></span></label></div>
+        <div class="list-item"><span>💼 قسم الخدمات</span><label class="toggle"><input type="checkbox" id="showServices" checked><span class="toggle-slider"></span></label></div>
+        <div class="list-item"><span>🖼️ قسم الجاليري</span><label class="toggle"><input type="checkbox" id="showGallery" checked><span class="toggle-slider"></span></label></div>
+        <div class="list-item"><span>🎯 قسم الاستشارات</span><label class="toggle"><input type="checkbox" id="showConsult" checked><span class="toggle-slider"></span></label></div>
+        <div class="list-item"><span>📞 قسم التواصل</span><label class="toggle"><input type="checkbox" id="showContact" checked><span class="toggle-slider"></span></label></div>
+        <div class="list-item"><span>📚 قسم المحتوى</span><label class="toggle"><input type="checkbox" id="showContent" checked><span class="toggle-slider"></span></label></div>
+      </div>
+    </div>
+
+    <!-- Content Management -->
+    <div id="tab-content" class="tab-content">
+      <h3 style="margin-bottom:20px;color:var(--main)">📚 إضافة محتوى جديد</h3>
+      <div class="form-grid">
+        <div class="form-group"><label>النوع</label>
+          <select id="contentType">
+            <option value="image">🖼️ صورة</option>
+            <option value="video">🎥 فيديو</option>
+            <option value="article">📄 مقال</option>
+          </select>
+        </div>
+        <div class="form-group"><label>العنوان</label><input type="text" id="contentTitle" placeholder="عنوان المحتوى"></div>
+        <div class="form-group"><label>الرابط</label><input type="text" id="contentLink" placeholder="رابط الصورة/الفيديو/المقال"></div>
+        <div class="form-group" style="grid-column:1/-1"><label>الوصف</label><textarea id="contentDesc" placeholder="وصف مختصر"></textarea></div>
+        <div class="form-group" style="grid-column:1/-1"><button class="btn" onclick="addContent()">➕ إضافة</button></div>
+      </div>
+      <h4 style="margin:25px 0 15px;color:var(--main)">📋 المحتوى الحالي</h4>
+      <div id="contentList"></div>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+// ✅ Firebase Imports v10.12.2
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+// ✅ ✅ ✅ Firebase Config - مشروع الدكتور تامر خطاب
+const firebaseConfig = {
+  apiKey: "AIzaSyCXOOWSZU5YW0diViWO23mIXojmTLIggi0",
+  authDomain: "dr-tamer-khatab.firebaseapp.com",
+  projectId: "dr-tamer-khatab",
+  storageBucket: "dr-tamer-khatab.firebasestorage.app",
+  messagingSenderId: "801994611384",
+  appId: "1:801994611384:web:d91064d8549b25427fb24d",
+  measurementId: "G-F341FN0EL6"
+};
+
+// ✅ ✅ ✅ Admin Email for Dr. Tamer Khatab
+const ADMIN_EMAIL = "admin@dr-tamer-khatab.com";
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const settingsRef = doc(db, "settings", "site");
+const contentRef = collection(db, "content");
+
+let $ = (id) => document.getElementById(id);
+let currentUser = null;
+
+// ✅ Auth State Listener
+onAuthStateChanged(auth, (user) => {
+  currentUser = user;
+  if (user && user.email === ADMIN_EMAIL) {
+    $("loginView").style.display = "none";
+    $("adminView").style.display = "block";
+    loadAllSettings();
+  } else {
+    $("loginView").style.display = "block";
+    $("adminView").style.display = "none";
+  }
+});
+
+// ✅ Login Function
+window.login = async function() {
+  const email = $("adminEmail").value.trim();
+  const pass = $("adminPass").value;
+  if (!email || !pass) return showToast("⚠️ أدخل البريد وكلمة المرور", "error");
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    showToast("✅ تم تسجيل الدخول بنجاح");
+  } catch (err) {
+    showToast("❌ خطأ: " + err.message, "error");
+  }
+};
+
+// ✅ Logout Function
+window.logout = () => signOut(auth).then(() => { showToast("✅ تم الخروج"); location.reload(); });
+
+// ✅ Tab Switcher
+window.switchTab = function(tab) {
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+  event.currentTarget.classList.add("active");
+  $("tab-" + tab).classList.add("active");
+};
+
+// ✅ Load All Settings from Firebase
+async function loadAllSettings() {
+  try {
+    const snap = await getDoc(settingsRef);
+    if (!snap.exists()) return;
+    const s = snap.data();
+    
+    // 🔹 General Settings
+    if (s.general) {
+      $("clinicName").value = s.general.clinicName || "";
+      $("doctorName").value = s.general.doctorName || "";
+      $("specialty").value = s.general.specialty || "";
+      $("primaryColor").value = s.general.primaryColor || "#1a237e";
+      $("bgColor").value = s.general.bgColor || "#f4f7f6";
+      $("heroTitle").value = s.general.heroTitle || "";
+      $("heroDesc").value = s.general.heroDesc || "";
+      $("heroDoctorImg").value = s.general.heroDoctorImg || "";
+      $("aboutDoctorImg").value = s.general.aboutDoctorImg || "";
+      $("aboutDoctorText").value = s.general.aboutDoctorText || "";
+      $("whatsappNum").value = s.general.whatsappNum || "";
+      $("phoneNum").value = s.general.phoneNum || "";
+      $("clinicAddress").value = s.general.clinicAddress || "";
+      $("mapLink").value = s.general.mapLink || "";
+      $("footerText").value = s.general.footerText || "";
+    }
+    
+    // 🔹 Navbar Links
+    renderNavbarList(s.navbar || []);
+    
+    // 🔹 Cards
+    renderCardsList(s.cards || []);
+    
+    // 🔹 Gallery
+    $("galleryAutoScroll").checked = s.gallery?.autoScroll || false;
+    renderGalleryList(s.gallery?.items || []);
+    
+    // 🔹 Consult Section
+    if (s.consult) {
+      $("consultTitle").value = s.consult.title || "";
+      $("consultDesc").value = s.consult.desc || "";
+      $("consultHours").value = s.consult.hours || "";
+      $("consultBadge").value = s.consult.badge || "";
+      $("consultShow").checked = s.consult.show !== false;
+    }
+    
+    // 🔹 Visibility Settings
+    if (s.visibility) {
+      $("showHero").checked = s.visibility.hero !== false;
+      $("showAbout").checked = s.visibility.about !== false;
+      $("showServices").checked = s.visibility.services !== false;
+      $("showGallery").checked = s.visibility.gallery !== false;
+      $("showConsult").checked = s.visibility.consult !== false;
+      $("showContact").checked = s.visibility.contact !== false;
+      $("showContent").checked = s.visibility.content !== false;
+    }
+    
+    // 🔹 Load Content List
+    loadContentList();
+    
+  } catch (err) { 
+    console.error("❌ Load Settings Error:", err); 
+    showToast("❌ فشل تحميل الإعدادات", "error"); 
+  }
+}
+
+// ✅ Save All Settings to Firebase
+window.saveAllSettings = async function() {
+  const btn = event.target;
+  btn.disabled = true; btn.innerHTML = "⏳ جاري الحفظ...";
+  
+  try {
+    const settings = {
+      general: {
+        clinicName: $("clinicName").value, 
+        doctorName: $("doctorName").value,
+        specialty: $("specialty").value, 
+        primaryColor: $("primaryColor").value,
+        bgColor: $("bgColor").value, 
+        heroTitle: $("heroTitle").value,
+        heroDesc: $("heroDesc").value, 
+        heroDoctorImg: $("heroDoctorImg").value,
+        aboutDoctorImg: $("aboutDoctorImg").value, 
+        aboutDoctorText: $("aboutDoctorText").value,
+        whatsappNum: $("whatsappNum").value, 
+        phoneNum: $("phoneNum").value,
+        clinicAddress: $("clinicAddress").value, 
+        mapLink: $("mapLink").value,
+        footerText: $("footerText").value
+      },
+      navbar: getNavbarList(),
+      cards: getCardsList(),
+      gallery: { 
+        autoScroll: $("galleryAutoScroll").checked, 
+        items: getGalleryList() 
+      },
+      consult: {
+        title: $("consultTitle").value, 
+        desc: $("consultDesc").value,
+        hours: $("consultHours").value, 
+        badge: $("consultBadge").value,
+        show: $("consultShow").checked
+      },
+      visibility: {
+        hero: $("showHero").checked, 
+        about: $("showAbout").checked,
+        services: $("showServices").checked, 
+        gallery: $("showGallery").checked,
+        consult: $("consultShow").checked, 
+        contact: $("showContact").checked,
+        content: $("showContent").checked
+      },
+      updatedAt: new Date().toISOString()
+    };
+    
+    await setDoc(settingsRef, settings, { merge: true });
+    showToast("✅ تم حفظ جميع الإعدادات بنجاح");
+    
+  } catch (err) { 
+    console.error("❌ Save Error:", err); 
+    showToast("❌ فشل الحفظ: " + err.message, "error"); 
+  }
+  finally { 
+    btn.disabled = false; 
+    btn.innerHTML = "💾 حفظ جميع الإعدادات"; 
+  }
+};
+
+// ============ Navbar Functions ============
+window.addNavbarLink = function() {
+  const text = $("navText").value.trim(), 
+        link = $("navLink").value.trim(), 
+        icon = $("navIcon").value || "🔗";
+  if (!text || !link) return showToast("⚠️ أدخل نص الرابط والرابط", "error");
+  
+  const list = JSON.parse(localStorage.getItem("navbar_temp") || "[]");
+  list.push({ id: Date.now(), text, link, icon });
+  localStorage.setItem("navbar_temp", JSON.stringify(list));
+  renderNavbarList(list);
+  
+  $("navText").value = ""; $("navLink").value = ""; $("navIcon").value = "";
+};
+
+function renderNavbarList(items) {
+  const container = $("navbarList");
+  if (!items.length) { 
+    container.innerHTML = "<p style='color:var(--text-light);padding:10px'>لا توجد روابط مضافة</p>"; 
+    return; 
+  }
+  container.innerHTML = items.map(item => `
+    <div class="list-item">
+      <span>${item.icon} ${item.text}</span>
+      <div class="actions">
+        <button class="btn-sm" style="background:#0ea5e9;color:#fff" onclick="editNavbarLink(${item.id})">✏️</button>
+        <button class="btn-sm btn-danger" onclick="removeNavbarLink(${item.id})">🗑️</button>
+      </div>
+    </div>`).join("");
+}
+
+function getNavbarList() { 
+  return JSON.parse(localStorage.getItem("navbar_temp") || "[]"); 
+}
+
+window.removeNavbarLink = function(id) {
+  let list = getNavbarList(); 
+  list = list.filter(i => i.id !== id);
+  localStorage.setItem("navbar_temp", JSON.stringify(list)); 
+  renderNavbarList(list);
+};
+
+window.editNavbarLink = function(id) {
+  const item = getNavbarList().find(i => i.id === id);
+  if (!item) return; 
+  $("navText").value = item.text; 
+  $("navLink").value = item.link; 
+  $("navIcon").value = item.icon;
+  removeNavbarLink(id);
+};
+
+// ============ Cards Functions ============
+window.addCard = function() {
+  const title = $("cardTitle").value.trim(), 
+        desc = $("cardDesc").value.trim(), 
+        icon = $("cardIcon").value.trim();
+  if (!title) return showToast("⚠️ أدخل عنوان الكارت", "error");
+  
+  const list = JSON.parse(localStorage.getItem("cards_temp") || "[]");
+  list.push({ id: Date.now(), title, desc, icon });
+  localStorage.setItem("cards_temp", JSON.stringify(list));
+  renderCardsList(list);
+  
+  $("cardTitle").value = ""; $("cardDesc").value = ""; $("cardIcon").value = "";
+};
+
+function renderCardsList(items) {
+  const container = $("cardsList");
+  if (!items.length) { 
+    container.innerHTML = "<p style='color:var(--text-light);padding:10px'>لا توجد كروت مضافة</p>"; 
+    return; 
+  }
+  container.innerHTML = items.map(item => `
+    <div class="card-preview">
+      ${item.icon?.startsWith('http') ? `<img src="${item.icon}" alt="">` : `<div style="font-size:32px;margin-bottom:8px">${item.icon}</div>`}
+      <h4>${item.title}</h4><p>${item.desc}</p>
+      <button class="btn-sm btn-danger" style="margin-top:8px" onclick="removeCard(${item.id})">🗑️ حذف</button>
+    </div>`).join("");
+}
+
+function getCardsList() { 
+  return JSON.parse(localStorage.getItem("cards_temp") || "[]"); 
+}
+
+window.removeCard = function(id) {
+  let list = getCardsList(); 
+  list = list.filter(i => i.id !== id);
+  localStorage.setItem("cards_temp", JSON.stringify(list)); 
+  renderCardsList(list);
+};
+
+// ============ Gallery Functions ============
+window.addGalleryItem = function() {
+  const img = $("galleryImg").value.trim();
+  if (!img) return showToast("⚠️ أدخل رابط الصورة", "error");
+  
+  const list = JSON.parse(localStorage.getItem("gallery_temp") || "[]");
+  list.push({ id: Date.now(), img });
+  localStorage.setItem("gallery_temp", JSON.stringify(list));
+  renderGalleryList(list);
+  
+  $("galleryImg").value = "";
+};
+
+function renderGalleryList(items) {
+  const container = $("galleryList");
+  if (!items.length) { 
+    container.innerHTML = "<p style='color:var(--text-light);padding:10px'>لا توجد صور في الجاليري</p>"; 
+    return; 
+  }
+  container.innerHTML = items.map(item => `
+    <div class="gallery-item">
+      <img src="${item.img}" alt="" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22150%22><rect fill=%22%23eee%22 width=%22100%%22 height=%22100%%22/></svg>'">
+      <div class="overlay"><span>🖼️</span><button onclick="removeGalleryItem(${item.id})">🗑️</button></div>
+    </div>`).join("");
+}
+
+function getGalleryList() { 
+  return JSON.parse(localStorage.getItem("gallery_temp") || "[]"); 
+}
+
+window.removeGalleryItem = function(id) {
+  let list = getGalleryList(); 
+  list = list.filter(i => i.id !== id);
+  localStorage.setItem("gallery_temp", JSON.stringify(list)); 
+  renderGalleryList(list);
+};
+
+// ============ Content Functions ============
+async function loadContentList() {
+  try {
+    const snap = await getDocs(contentRef);
+    const container = $("contentList");
+    if (snap.empty) { 
+      container.innerHTML = "<p style='color:var(--text-light);padding:10px'>لا يوجد محتوى بعد</p>"; 
+      return; 
+    }
+    container.innerHTML = "";
+    snap.forEach(docSnap => {
+      const item = docSnap.data();
+      container.innerHTML += `
+        <div class="card" style="margin-bottom:12px;padding:15px">
+          <div style="display:flex;justify-content:space-between;align-items:start">
+            <div>
+              <span class="badge badge-${item.type}">${item.type === "image" ? "🖼️" : item.type === "video" ? "🎥" : "📄"}</span>
+              <h4 style="margin:5px 0">${item.title}</h4>
+              ${item.desc ? `<p style="font-size:13px;color:var(--text-light)">${item.desc}</p>` : ""}
+            </div>
+            <div style="display:flex;gap:6px">
+              <button class="btn-sm" style="background:#0ea5e9;color:#fff" onclick="editContent('${docSnap.id}')">✏️</button>
+              <button class="btn-sm btn-danger" onclick="deleteContent('${docSnap.id}')">🗑️</button>
+            </div>
+          </div>
+        </div>`;
+    });
+  } catch (err) { 
+    console.error("❌ Load Content Error:", err); 
+  }
+}
+
+window.addContent = async function() {
+  const type = $("contentType").value, 
+        title = $("contentTitle").value.trim(), 
+        link = $("contentLink").value.trim(), 
+        desc = $("contentDesc").value.trim();
+  if (!title || !link) return showToast("⚠️ العنوان والرابط مطلوبان", "error");
+  
+  try {
+    await addDoc(contentRef, { 
+      type, title, link, desc, 
+      createdAt: new Date().toISOString() 
+    });
+    showToast("✅ تم إضافة المحتوى");
+    $("contentTitle").value = ""; 
+    $("contentLink").value = ""; 
+    $("contentDesc").value = "";
+    loadContentList();
+  } catch (err) { 
+    showToast("❌ فشل الإضافة: " + err.message, "error"); 
+  }
+};
+
+window.deleteContent = async function(id) {
+  if (!confirm("⚠️ حذف هذا العنصر؟")) return;
+  try { 
+    await deleteDoc(doc(db, "content", id)); 
+    showToast("✅ تم الحذف"); 
+    loadContentList(); 
+  } catch (err) { 
+    showToast("❌ فشل الحذف", "error"); 
+  }
+};
+
+window.editContent = function(id) { 
+  showToast("⚠️ التعديل المباشر غير متاح، احذف وأعد الإضافة", "error"); 
+};
+
+// ✅ Toast Notification
+function showToast(msg, type = "success") {
+  const toast = document.createElement("div");
+  toast.className = `toast ${type === "error" ? "error" : ""}`;
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 4000);
+}
+
+// ✅ Mobile Menu Toggle
+window.toggleMenu = () => $("sideNav")?.classList.toggle("open");
+
+// ✅ Initialize Admin Panel
+console.log("✅ Site Admin Page Loaded - dr-tamer-khatab Connected");
+</script>
+</body>
+</html>
