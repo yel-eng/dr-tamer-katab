@@ -169,7 +169,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);pad
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, addDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 /* =========================
@@ -191,6 +191,17 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 const patientsRef = collection(db, "patients");
+
+// ✅ جعل المتغيرات متاحة عالمياً للوظائف الإضافية
+window.db = db;
+window.patientsRef = patientsRef;
+window.addDoc = addDoc;
+window.serverTimestamp = serverTimestamp;
+window.query = query;
+window.where = where;
+window.getDocs = getDocs;
+window.deleteDoc = deleteDoc;
+window.writeBatch = writeBatch;
 
 let patientsCache = [];
 const $ = (id) => document.getElementById(id);
@@ -291,54 +302,45 @@ function renderPatients(list) {
   }).join("");
 }
 
-window.applyOnlineFilter = async function() {
-  const search = $("searchInput").value.trim().toLowerCase();
-  const type = $("filterType").value;
-  const sort = $("sortBy").value;
+// ✅ ✅ ✅ دالة الفلتر المُصححة - تعمل محلياً على الكاش (أسرع وأضمن)
+window.applyOnlineFilter = function() {
+  const search = $("searchInput")?.value.trim().toLowerCase() || "";
+  const type = $("filterType")?.value || "all";
+  const sort = $("sortBy")?.value || "newest";
   
-  $("patientsList").innerHTML = '<div class="loading-state">🔄 جاري البحث... <span class="loading-spinner"></span></div>';
+  $("patientsList").innerHTML = '<div class="loading-state">🔄 جاري الفلترة...</div>';
   
-  try {
-    let snap;
-    try {
-      if (type !== "all" && sort === "newest") { 
-        snap = await getDocs(query(patientsRef, where("type", "==", type), orderBy("createdAt", "desc"))); 
-      } else if (type !== "all" && sort === "oldest") { 
-        snap = await getDocs(query(patientsRef, where("type", "==", type), orderBy("createdAt", "asc"))); 
-      } else { 
-        snap = await getDocs(query(patientsRef, orderBy("createdAt", "desc"))); 
-      }
-    } catch { 
-      snap = await getDocs(query(patientsRef)); 
-    }
-    
-    let results = [];
-    snap.forEach(d => {
-      const data = d.data();
-      data._ts = data.createdAt || data.updatedAt;
-      if (!data.type) data.type = (data.sessions||[]).length >= 5 ? "vip" : (data.sessions||[]).length >= 2 ? "regular" : "new";
-      results.push({ id: d.id, ...data });
-    });
-    
-    if (search) {
-      results = results.filter(p => 
-        (p.name?.toLowerCase().includes(search)) || 
-        (p.phone?.includes(search))
-      );
-    }
-    if (sort === "name") {
-      results.sort((a,b) => (a.name||"").localeCompare(b.name||""));
-    }
-    
-    renderPatients(results);
-    $("patientsCount").textContent = `${results.length} مريض`;
-    
-    if (results.length === 0) {
-      $("patientsList").innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">🔍</div><p>لا توجد نتائج</p></div>`;
-    }
-  } catch (err) { 
-    showToast("❌ فشل الفلتر", "error"); 
-    loadPatients(); 
+  // ✅ نبدأ من الكاش المحلي
+  let results = [...patientsCache];
+  
+  // 🔹 فلتر النوع
+  if (type !== "all") {
+    results = results.filter(p => p.type === type);
+  }
+  
+  // 🔹 فلتر البحث
+  if (search) {
+    results = results.filter(p => 
+      (p.name?.toLowerCase().includes(search)) || 
+      (p.phone?.includes(search))
+    );
+  }
+  
+  // 🔹 الترتيب
+  if (sort === "name") {
+    results.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+  } else if (sort === "oldest") {
+    results.sort((a, b) => (a._ts?.seconds || 0) - (b._ts?.seconds || 0));
+  } else {
+    results.sort((a, b) => (b._ts?.seconds || 0) - (a._ts?.seconds || 0));
+  }
+  
+  // ✅ عرض النتائج
+  renderPatients(results);
+  $("patientsCount").textContent = `${results.length} مريض`;
+  
+  if (results.length === 0) {
+    $("patientsList").innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">🔍</div><p>لا توجد نتائج</p></div>`;
   }
 };
 
@@ -421,7 +423,7 @@ window.savePatient = async function() {
   }
 };
 
-// ✅ ✅ ✅ دالة addSession المُصححة نهائيًا: باستخدام new Date() بدل serverTimestamp() داخل المصفوفة
+// ✅ دالة addSession المُصححة: باستخدام new Date() بدل serverTimestamp() داخل المصفوفة
 window.addSession = async function() {
   const id = $("modalPatientId").value;
   const date = $("newSessionDate").value;
@@ -434,18 +436,17 @@ window.addSession = async function() {
     const p = snap.data();
     const sessions = p.sessions || [];
     
-    // ✅ ✅ ✅ استخدام new Date() بدل serverTimestamp() (لأن فايربيس لا يدعمه داخل المصفوفات)
     sessions.push({ 
       date, 
       time: $("newSessionTime").value, 
       note: $("newSessionNote").value.trim(),
       paid: $("newSessionPaid").value ? Number($("newSessionPaid").value) : null, 
-      createdAt: new Date()  // ✅ ✅ ✅ هذا هو التصحيح النهائي المطلوب
+      createdAt: new Date()
     });
     
     await updateDoc(patientRef, { 
       sessions, 
-      updatedAt: serverTimestamp()  // ✅ هذا بره المصفوفة فمسموح
+      updatedAt: serverTimestamp()
     });
     
     showToast("✅ تم إضافة الجلسة"); 
@@ -603,6 +604,117 @@ async function handleAutoOpenFromUrl() {
     }, 1500);
   }
 }
+
+// ✅ ✅ ✅ دالة عالمية لإضافة بيانات تجريبية (تشتغل من أي مكان)
+window.addTestPatientsGlobal = async function() {
+  try {
+    const patientsRef = window.patientsRef || collection(db, "patients");
+    const { addDoc, serverTimestamp } = window;
+    
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    
+    const testPatients = [
+      {
+        name: "✨ مريض جديد - تجريب",
+        phone: "01000000001",
+        age: "25",
+        type: "new",
+        notes: "مريض تجريبي - جرب فلتر 'جدد'",
+        createdAt: serverTimestamp ? serverTimestamp() : new Date(),
+        updatedAt: serverTimestamp ? serverTimestamp() : new Date(),
+        sessions: [{ date: today, time: "10:00", note: "أول زيارة", paid: 200, createdAt: new Date() }]
+      },
+      {
+        name: "🔄 مريض منتظم - تجريب",
+        phone: "01000000002", 
+        age: "40",
+        type: "regular",
+        notes: "مريض تجريبي - جرب فلتر 'منتظمين'",
+        createdAt: serverTimestamp ? serverTimestamp() : new Date(),
+        updatedAt: serverTimestamp ? serverTimestamp() : new Date(),
+        sessions: [
+          { date: "2024-03-01", time: "09:00", note: "زيارة 1", paid: 200, createdAt: new Date() },
+          { date: "2024-04-01", time: "09:00", note: "زيارة 2", paid: 200, createdAt: new Date() }
+        ]
+      },
+      {
+        name: "⭐ مريض مميز - تجريب",
+        phone: "01000000003",
+        age: "55", 
+        type: "vip",
+        notes: "مريض تجريبي - جرب فلتر 'مميزين'",
+        createdAt: serverTimestamp ? serverTimestamp() : new Date(),
+        updatedAt: serverTimestamp ? serverTimestamp() : new Date(),
+        sessions: [
+          { date: "2024-01-01", time: "11:00", note: "جلسة 1", paid: 500, createdAt: new Date() },
+          { date: "2024-02-01", time: "11:00", note: "جلسة 2", paid: 500, createdAt: new Date() },
+          { date: "2024-03-01", time: "11:00", note: "جلسة 3", paid: 500, createdAt: new Date() },
+          { date: "2024-04-01", time: "11:00", note: "جلسة 4", paid: 500, createdAt: new Date() },
+          { date: "2024-05-01", time: "11:00", note: "جلسة 5", paid: 500, createdAt: new Date() }
+        ]
+      }
+    ];
+
+    for (const p of testPatients) {
+      await addDoc(patientsRef, p);
+      console.log(`✅ أضيف: ${p.name}`);
+    }
+    
+    alert("🎉 تم إضافة 3 مرضى تجريبيين!\n✨ جديد | 🔄 منتظم | ⭐ مميز\nجربي الفلتر الآن!");
+    location.reload();
+    
+  } catch (err) {
+    console.error("❌ خطأ:", err);
+    alert("❌ فشل إضافة البيانات: " + err.message);
+  }
+};
+
+// ✅ إضافة أزرار التجريب في الهيدر
+document.addEventListener('DOMContentLoaded', function() {
+  const header = document.querySelector('.page-header > div:last-child');
+  if (header) {
+    // زر إضافة بيانات تجريبية
+    const testBtn = document.createElement('button');
+    testBtn.className = 'btn';
+    testBtn.style.background = '#f59e0b';
+    testBtn.style.marginLeft = '10px';
+    testBtn.textContent = '🧪 إضافة بيانات تجريبية';
+    testBtn.onclick = function() {
+      if (confirm('هل تريد إضافة 3 مرضى تجريبيين لتجربة الفلتر؟')) {
+        window.addTestPatientsGlobal();
+      }
+    };
+    header.appendChild(testBtn);
+    
+    // زر حذف البيانات التجريبية
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'btn';
+    deleteBtn.style.background = '#ef4444';
+    deleteBtn.style.marginLeft = '5px';
+    deleteBtn.textContent = '🗑️ حذف التجريبي';
+    deleteBtn.onclick = async function() {
+      if (!confirm('حذف المرضى التجريبيين؟')) return;
+      try {
+        const phones = ["01000000001", "01000000002", "01000000003"];
+        for (const phone of phones) {
+          const q = query(patientsRef, where("phone", "==", phone));
+          const snap = await getDocs(q);
+          for (const d of snap.docs) {
+            await deleteDoc(d.ref);
+          }
+        }
+        alert("✅ تم حذف المرضى التجريبيين");
+        location.reload();
+      } catch (err) {
+        alert("❌ خطأ: " + err.message);
+      }
+    };
+    header.appendChild(deleteBtn);
+    
+    console.log('🔧 أزرار التجريب أُضيفت بنجاح');
+  }
+});
 
 console.log("✅ Patients Page Loaded - dr-tamer-khatab Connected");
 </script>
