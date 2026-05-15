@@ -421,7 +421,7 @@ window.savePatient = async function() {
   }
 };
 
-// ✅ ✅ ✅ دالة addSession المُصححة: باستخدام new Date() بدل serverTimestamp() داخل المصفوفة
+// ✅ ✅ ✅ دالة addSession المُصححة نهائيًا: باستخدام new Date() بدل serverTimestamp() داخل المصفوفة
 window.addSession = async function() {
   const id = $("modalPatientId").value;
   const date = $("newSessionDate").value;
@@ -434,13 +434,13 @@ window.addSession = async function() {
     const p = snap.data();
     const sessions = p.sessions || [];
     
-    // ✅ استخدام new Date() بدل serverTimestamp() (لأن فايربيس لا يدعمه داخل المصفوفات)
+    // ✅ ✅ ✅ استخدام new Date() بدل serverTimestamp() (لأن فايربيس لا يدعمه داخل المصفوفات)
     sessions.push({ 
       date, 
       time: $("newSessionTime").value, 
       note: $("newSessionNote").value.trim(),
       paid: $("newSessionPaid").value ? Number($("newSessionPaid").value) : null, 
-      createdAt: new Date()  // ✅ ✅ ✅ هذا هو التصحيح المطلوب
+      createdAt: new Date()  // ✅ ✅ ✅ هذا هو التصحيح النهائي المطلوب
     });
     
     await updateDoc(patientRef, { 
