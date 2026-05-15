@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<title>ميديكال كلينك - رعاية طبية متميزة</title>
+<title>عيادة الدكتور تامر خطاب - رعاية طبية متميزة</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
@@ -21,6 +21,24 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Tajawal',sans-serif}
 body{background:var(--bg);color:var(--dark);line-height:1.6;overflow-x:hidden}
+
+/* ✅ ✅ ✅ LOADING OVERLAY - يخفي المحتوى حتى تحميل الإعدادات */
+#loadingOverlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:var(--bg);z-index:99999;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity 0.4s ease, visibility 0.4s ease;
+}
+#loadingOverlay.hidden{
+  opacity:0;visibility:hidden;pointer-events:none;
+}
+.loading-spinner{
+  width:50px;height:50px;border:4px solid var(--primary-light);
+  border-top-color:transparent;border-radius:50%;
+  animation:spin 1s linear infinite;margin-bottom:20px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{color:var(--muted);font-size:14px}
 
 /* Login Button */
 .login-btn{
@@ -242,7 +260,6 @@ footer{
   border-top-color:transparent;border-radius:50%;
   animation:spin 1s linear infinite;
 }
-@keyframes spin{to{transform:rotate(360deg)}}
 
 /* EMPTY STATE */
 .empty{
@@ -252,6 +269,10 @@ footer{
 
 /* SECTION HIDDEN (controlled by admin) */
 .section-hidden{display:none!important}
+
+/* ✅ ✅ ✅ إخفاء المحتوى الرئيسي حتى تحميل الإعدادات */
+#mainContent{opacity:0;transition:opacity 0.4s ease}
+#mainContent.loaded{opacity:1}
 
 /* RESPONSIVE */
 @media(max-width:1100px){
@@ -286,6 +307,12 @@ footer{
 </head>
 <body>
 
+<!-- ✅ ✅ ✅ LOADING OVERLAY - يظهر أولاً ويختفي بعد تحميل الإعدادات -->
+<div id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <p class="loading-text">جاري تحميل إعدادات العيادة...</p>
+</div>
+
 <!-- Login Button -->
 <a href="login.html" class="login-btn">🔐 دخول الأدمن</a>
 
@@ -301,151 +328,156 @@ footer{
   <a href="booking.html">📅 احجز الآن</a>
 </nav>
 
-<!-- Hero Section (can be hidden by admin) -->
-<section class="hero" id="heroSection">
-  <div class="hero-content">
-    <div class="hero-text">
-      <h1 id="heroTitle">ميديكال <span>كلينك</span></h1>
-      <p id="heroDesc">رعاية طبية متميزة بخبرة واحترافية. نظام حجز ذكي يضمن لك تجربة مريحة بدون انتظار، مع متابعة شخصية لكل مريض.</p>
-      <div class="hero-buttons">
-        <a href="booking.html" class="btn-primary">📅 احجز موعدك الآن</a>
-        <a href="#doctor" class="btn-outline">👨‍⚕️ تعرف علينا</a>
+<!-- ✅ ✅ ✅ المحتوى الرئيسي مخفي حتى تحميل الإعدادات -->
+<div id="mainContent">
+  
+  <!-- Hero Section (can be hidden by admin) -->
+  <section class="hero" id="heroSection">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 id="heroTitle">عيادة الدكتور <span>تامر خطاب</span></h1>
+        <p id="heroDesc">رعاية طبية متميزة بخبرة واحترافية. نظام حجز ذكي يضمن لك تجربة مريحة بدون انتظار، مع متابعة شخصية لكل مريض.</p>
+        <div class="hero-buttons">
+          <a href="booking.html" class="btn-primary">📅 احجز موعدك الآن</a>
+          <a href="#doctor" class="btn-outline">👨‍⚕️ تعرف علينا</a>
+        </div>
+      </div>
+      <div class="hero-img">
+        <div class="hero-img-wrapper">
+          <img id="heroDoctorImg" src="https://i.pravatar.cc/320?img=12" alt="صورة الدكتور">
+        </div>
       </div>
     </div>
-    <div class="hero-img">
-      <div class="hero-img-wrapper">
-        <img id="heroDoctorImg" src="https://i.pravatar.cc/320?img=12" alt="صورة الدكتور">
+  </section>
+
+  <!-- Cards Section (can be hidden by admin) -->
+  <section class="cards" id="cardsSection">
+    <div class="card">
+      <div class="card-icon">⭐</div>
+      <h3>خدمة متميزة</h3>
+      <p>رعاية شخصية واهتمام بكل تفاصيل حالتك الصحية</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🧠</div>
+      <h3>تقنيات حديثة</h3>
+      <p>أحدث الأجهزة والبروتوكولات الطبية لضمان أفضل نتائج</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">❤️</div>
+      <h3>راحة المريض</h3>
+      <p>بيئة مريحة ومواعيد مرنة تناسب ظروفك</p>
+    </div>
+  </section>
+
+  <!-- Doctor Section (can be hidden by admin) -->
+  <section class="doctor" id="doctorSection">
+    <div class="doctor-content">
+      <h2 id="doctorName">عن الدكتور تامر خطاب</h2>
+      <p class="specialty" id="doctorSpecialty">استشاري الأمراض الباطنية</p>
+      <p id="doctorBio">خبرة طويلة في التشخيص والعلاج باستخدام أحدث البروتوكولات الطبية. نؤمن بأن كل مريض حالة فريدة تستحق رعاية خاصة ومتابعة دقيقة.</p>
+      <a href="booking.html" class="btn-primary">📅 احجز استشارة</a>
+    </div>
+    <div class="doctor-img">
+      <img id="aboutDoctorImg" src="https://i.pravatar.cc/320?img=12" alt="الدكتور تامر خطاب">
+    </div>
+  </section>
+
+  <!-- Gallery Section (can be hidden by admin) -->
+  <section class="gallery" id="gallerySection">
+    <h3 class="gallery-title">📸 جاليري العيادة</h3>
+    <div class="gallery-track" id="galleryTrack">
+      <!-- Gallery images loaded dynamically -->
+    </div>
+  </section>
+
+  <!-- Media Library (can be hidden by admin) -->
+  <section class="media" id="mediaSection">
+    <h2>📚 المكتبة الطبية</h2>
+    
+    <div class="media-section">
+      <h3>🖼️ صور</h3>
+      <div class="media-grid" id="imagesContainer">
+        <div class="loading">جاري تحميل الصور...</div>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- Cards Section (can be hidden by admin) -->
-<section class="cards" id="cardsSection">
-  <div class="card">
-    <div class="card-icon">⭐</div>
-    <h3>خدمة متميزة</h3>
-    <p>رعاية شخصية واهتمام بكل تفاصيل حالتك الصحية</p>
-  </div>
-  <div class="card">
-    <div class="card-icon">🧠</div>
-    <h3>تقنيات حديثة</h3>
-    <p>أحدث الأجهزة والبروتوكولات الطبية لضمان أفضل نتائج</p>
-  </div>
-  <div class="card">
-    <div class="card-icon">❤️</div>
-    <h3>راحة المريض</h3>
-    <p>بيئة مريحة ومواعيد مرنة تناسب ظروفك</p>
-  </div>
-</section>
-
-<!-- Doctor Section (can be hidden by admin) -->
-<section class="doctor" id="doctorSection">
-  <div class="doctor-content">
-    <h2 id="doctorName">عن الدكتور</h2>
-    <p class="specialty" id="doctorSpecialty">استشاري الباطنة</p>
-    <p id="doctorBio">خبرة طويلة في التشخيص والعلاج باستخدام أحدث البروتوكولات الطبية. نؤمن بأن كل مريض حالة فريدة تستحق رعاية خاصة ومتابعة دقيقة.</p>
-    <a href="booking.html" class="btn-primary">📅 احجز استشارة</a>
-  </div>
-  <div class="doctor-img">
-    <img id="aboutDoctorImg" src="https://i.pravatar.cc/320?img=12" alt="الدكتور">
-  </div>
-</section>
-
-<!-- Gallery Section (can be hidden by admin) -->
-<section class="gallery" id="gallerySection">
-  <h3 class="gallery-title">📸 جاليري العيادة</h3>
-  <div class="gallery-track" id="galleryTrack">
-    <!-- Gallery images loaded dynamically -->
-  </div>
-</section>
-
-<!-- Media Library (can be hidden by admin) -->
-<section class="media" id="mediaSection">
-  <h2>📚 المكتبة الطبية</h2>
-  
-  <div class="media-section">
-    <h3>🖼️ صور</h3>
-    <div class="media-grid" id="imagesContainer">
-      <div class="loading">جاري تحميل الصور...</div>
-    </div>
-  </div>
-  
-  <div class="media-section">
-    <h3>🎥 فيديوهات</h3>
-    <div class="media-grid" id="videosContainer">
-      <div class="loading">جاري تحميل الفيديوهات...</div>
-    </div>
-  </div>
-  
-  <div class="media-section">
-    <h3>📄 مقالات طبية</h3>
-    <div class="media-grid" id="articlesContainer">
-      <div class="loading">جاري تحميل المقالات...</div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA Section (Consultations - can be hidden by admin) -->
-<section class="cta" id="consultSection">
-  <div class="cta-content">
-    <div class="cta-text">
-      <h2 id="consultTitle">🎯 استشارة مجانية لأول زيارة</h2>
-      <p id="consultDesc">احجز الآن واستفد من تقييم طبي شامل بدون رسوم. الأماكن محدودة هذا الشهر!</p>
-      <p><strong>🕐 مواعيد العمل:</strong> <span id="consultHours">يومياً من 12 ظهراً حتى 5 مساءً</span></p>
-      <p><strong>💻 متاح:</strong> استشارات أونلاين عبر الفيديو</p>
-      <div class="cta-buttons">
-        <a href="tel:01211538334" class="call-btn">📞 اتصل الآن</a>
-        <a href="https://wa.me/201556614498" class="wa-btn" id="consultWaBtn"><i class="fab fa-whatsapp"></i> واتساب</a>
+    
+    <div class="media-section">
+      <h3>🎥 فيديوهات</h3>
+      <div class="media-grid" id="videosContainer">
+        <div class="loading">جاري تحميل الفيديوهات...</div>
       </div>
     </div>
-    <div class="cta-badge" id="consultBadge">🔥 عرض لفترة محدودة</div>
-  </div>
-</section>
-
-<!-- Contact Section (can be hidden by admin) -->
-<section class="contact" id="contactSection">
-  <h2 style="text-align:center;margin-bottom:30px;color:var(--primary)">📍 تواصل معنا</h2>
-  <div class="contact-grid">
-    <div class="contact-card">
-      <i class="fas fa-map-marker-alt"></i>
-      <h4>العنوان</h4>
-      <p id="clinicAddress">الإسكندرية، مصر</p>
+    
+    <div class="media-section">
+      <h3>📄 مقالات طبية</h3>
+      <div class="media-grid" id="articlesContainer">
+        <div class="loading">جاري تحميل المقالات...</div>
+      </div>
     </div>
-    <div class="contact-card">
-      <i class="fas fa-phone"></i>
-      <h4>اتصال مباشر</h4>
-      <p><a href="tel:01211538334" id="phoneNum">01211538334</a></p>
-    </div>
-    <div class="contact-card">
-      <i class="fab fa-whatsapp"></i>
-      <h4>واتساب</h4>
-      <p><a href="https://wa.me/201556614498" id="whatsappNum" target="_blank">مراسلة الآن</a></p>
-    </div>
-    <div class="contact-card">
-      <i class="fas fa-clock"></i>
-      <h4>مواعيد العمل</h4>
-      <p>يومياً 12 ص - 5 م</p>
-    </div>
-  </div>
-</section>
+  </section>
 
-<!-- Map Section -->
-<section class="map">
-  <div class="map-container">
-    <iframe id="mapFrame" src="https://www.google.com/maps?q=alexandria+egypt&output=embed" loading="lazy"></iframe>
-  </div>
-</section>
+  <!-- CTA Section (Consultations - can be hidden by admin) -->
+  <section class="cta" id="consultSection">
+    <div class="cta-content">
+      <div class="cta-text">
+        <h2 id="consultTitle">🎯 استشارة مجانية لأول زيارة</h2>
+        <p id="consultDesc">احجز الآن واستفد من تقييم طبي شامل بدون رسوم. الأماكن محدودة هذا الشهر!</p>
+        <p><strong>🕐 مواعيد العمل:</strong> <span id="consultHours">يومياً من 12 ظهراً حتى 5 مساءً</span></p>
+        <p><strong>💻 متاح:</strong> استشارات أونلاين عبر الفيديو</p>
+        <div class="cta-buttons">
+          <a href="tel:01211538334" class="call-btn">📞 اتصل الآن</a>
+          <a href="https://wa.me/201556614498" class="wa-btn" id="consultWaBtn"><i class="fab fa-whatsapp"></i> واتساب</a>
+        </div>
+      </div>
+      <div class="cta-badge" id="consultBadge">🔥 عرض لفترة محدودة</div>
+    </div>
+  </section>
 
-<!-- Footer -->
-<footer>
-  <p id="footerText">© <span id="currentYear">2024</span> <span id="clinicNameFooter">ميديكال كلينك</span> - جميع الحقوق محفوظة</p>
-</footer>
+  <!-- Contact Section (can be hidden by admin) -->
+  <section class="contact" id="contactSection">
+    <h2 style="text-align:center;margin-bottom:30px;color:var(--primary)">📍 تواصل معنا</h2>
+    <div class="contact-grid">
+      <div class="contact-card">
+        <i class="fas fa-map-marker-alt"></i>
+        <h4>العنوان</h4>
+        <p id="clinicAddress">الإسكندرية، مصر</p>
+      </div>
+      <div class="contact-card">
+        <i class="fas fa-phone"></i>
+        <h4>اتصال مباشر</h4>
+        <p><a href="tel:01211538334" id="phoneNum">01211538334</a></p>
+      </div>
+      <div class="contact-card">
+        <i class="fab fa-whatsapp"></i>
+        <h4>واتساب</h4>
+        <p><a href="https://wa.me/201556614498" id="whatsappNum" target="_blank">مراسلة الآن</a></p>
+      </div>
+      <div class="contact-card">
+        <i class="fas fa-clock"></i>
+        <h4>مواعيد العمل</h4>
+        <p>يومياً 12 ص - 5 م</p>
+      </div>
+    </div>
+  </section>
 
-<!-- WhatsApp Floating Button -->
-<a href="https://wa.me/201556614498" class="wa-float" id="waFloat" target="_blank">
-  <i class="fab fa-whatsapp"></i>
-</a>
+  <!-- Map Section -->
+  <section class="map">
+    <div class="map-container">
+      <iframe id="mapFrame" src="https://www.google.com/maps?q=alexandria+egypt&output=embed" loading="lazy"></iframe>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p id="footerText">© <span id="currentYear">2024</span> <span id="clinicNameFooter">عيادة الدكتور تامر خطاب</span> - جميع الحقوق محفوظة</p>
+  </footer>
+
+  <!-- WhatsApp Floating Button -->
+  <a href="https://wa.me/201556614498" class="wa-float" id="waFloat" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+</div> <!-- ✅ نهاية #mainContent -->
 
 <!-- Firebase + Dynamic Content -->
 <script type="module">
@@ -479,6 +511,23 @@ function adjustColor(hex, percent) {
   let g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + percent));
   let b = Math.min(255, Math.max(0, (num & 0x0000FF) + percent));
   return `#${(1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1)}`;
+}
+
+// ✅ ✅ ✅ دالة إظهار المحتوى بعد تحميل الإعدادات
+function showMainContent() {
+  const overlay = $("loadingOverlay");
+  const main = $("mainContent");
+  
+  // إخفاء الـ overlay بنعومة
+  if (overlay) overlay.classList.add("hidden");
+  
+  // إظهار المحتوى الرئيسي
+  if (main) {
+    // ننتظر شوية عشان الـ transition يشتغل
+    setTimeout(() => {
+      main.classList.add("loaded");
+    }, 100);
+  }
 }
 
 // ✅ Load Site Settings from Firebase
@@ -551,6 +600,10 @@ async function loadSettings() {
   } catch (err) { 
     console.warn("⚠️ Load Settings:", err); 
     loadDefaults(); 
+  }
+  finally {
+    // ✅ ✅ ✅ إظهار المحتوى بعد انتهاء تحميل الإعدادات (سواء نجح أو فشل)
+    showMainContent();
   }
 }
 
@@ -632,8 +685,13 @@ document.querySelectorAll(".navbar a").forEach(link => {
 // ✅ Initialize Page
 document.addEventListener("DOMContentLoaded", async () => {
   $("currentYear").textContent = new Date().getFullYear();
+  
+  // ✅ ✅ ✅ نبدأ بتحميل الإعدادات أولاً
   await loadSettings();
-  await loadContent();
+  
+  // ✅ ✅ ✅ ثم نحمّل المحتوى (بدون انتظار عشان ما يتأخرش)
+  loadContent();
+  
   console.log("✅ Main Page Loaded - dr-tamer-khatab Connected");
 });
 </script>
