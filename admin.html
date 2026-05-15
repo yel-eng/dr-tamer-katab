@@ -455,7 +455,27 @@ window.renderSlots = function(preserved = null) {
 
 window.forceRefresh = function() { const grid = $("daysGrid"); if(grid) grid.innerHTML = `<div class="loading-state">🔄 جاري التحديث...</div>`; if (unsubscribeSlots) unsubscribeSlots(); setTimeout(() => { unsubscribeSlots = onSnapshot(slotsRef, (snap) => { cache = []; snap.forEach(d => cache.push({ id: d.id, ...d.data(), booked: d.data().booked === true, status: d.data().status || (d.data().booked ? "booked" : "available") })); renderSlots(); loadPendingRequests(); }, (err) => { if(grid) grid.innerHTML = `<div class="empty-state" style="color:var(--danger);">⚠️ فشل: ${err.message}</div>`; }); }, 500); };
 window.toggleDay = function(date) { collapsedDays[date] = !collapsedDays[date]; renderSlots(); };
-window.cancelSlot = async (slotId) => { const slot = cache.find(s => s.id === slotId); if (!slot || !slot.booked) return alert("اختر ميعاداً محجوزاً"); if (!confirm("تأكيد الإلغاء؟")) return; try { await updateDoc(doc(db, "slots", slotId), { booked: false, status: "cancelled", patient: null, paid: 0, cancelledAt: serverTimestamp() }); showAdminNotification("✅ تم الإلغاء"); } catch (err) { alert("❌ خطأ: " + err.message); } };
+
+// ✅ ✅ ✅ دالة cancelSlot المُصححة - ترجع الميعاد متاح بعد الإلغاء
+window.cancelSlot = async (slotId) => { 
+  const slot = cache.find(s => s.id === slotId); 
+  if (!slot || !slot.booked) return alert("⚠️ اختر ميعاداً محجوزاً"); 
+  
+  if (!confirm("تأكيد إلغاء هذا الميعاد؟\nسيتم إرجاعه كـ 'متاح' للحجز مرة أخرى")) return; 
+  
+  try { 
+    await updateDoc(doc(db, "slots", slotId), { 
+      booked: false, 
+      status: "available",  // ✅ ✅ ✅ التصحيح: يرجع متاح مش ملغي
+      patient: null, 
+      paid: 0, 
+      cancelledAt: serverTimestamp()  // ✅ نسجل تاريخ الإلغاء للمراجعة
+    }); 
+    showAdminNotification("✅ تم الإلغاء - الميعاد عاد متاح للحجز"); 
+  } catch (err) { 
+    alert("❌ خطأ: " + err.message); 
+  } 
+};
 
 // ✅ ✅ ✅ دالة إضافة ميعاد ليوم معين مع التحقق الذكي
 window.addSlotToDate = async (date) => { 
