@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>ميديكال كلينك - رعاية طبية متميزة</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -250,6 +250,9 @@ footer{
   background:var(--bg);border-radius:16px;
 }
 
+/* SECTION HIDDEN (controlled by admin) */
+.section-hidden{display:none!important}
+
 /* RESPONSIVE */
 @media(max-width:1100px){
   .cards{grid-template-columns:repeat(2,1fr)}
@@ -298,12 +301,12 @@ footer{
   <a href="booking.html">📅 احجز الآن</a>
 </nav>
 
-<!-- Hero Section -->
-<section class="hero">
+<!-- Hero Section (can be hidden by admin) -->
+<section class="hero" id="heroSection">
   <div class="hero-content">
     <div class="hero-text">
-      <h1>ميديكال <span>كلينك</span></h1>
-      <p>رعاية طبية متميزة بخبرة واحترافية. نظام حجز ذكي يضمن لك تجربة مريحة بدون انتظار، مع متابعة شخصية لكل مريض.</p>
+      <h1 id="heroTitle">ميديكال <span>كلينك</span></h1>
+      <p id="heroDesc">رعاية طبية متميزة بخبرة واحترافية. نظام حجز ذكي يضمن لك تجربة مريحة بدون انتظار، مع متابعة شخصية لكل مريض.</p>
       <div class="hero-buttons">
         <a href="booking.html" class="btn-primary">📅 احجز موعدك الآن</a>
         <a href="#doctor" class="btn-outline">👨‍⚕️ تعرف علينا</a>
@@ -317,8 +320,8 @@ footer{
   </div>
 </section>
 
-<!-- Cards Section -->
-<section class="cards">
+<!-- Cards Section (can be hidden by admin) -->
+<section class="cards" id="cardsSection">
   <div class="card">
     <div class="card-icon">⭐</div>
     <h3>خدمة متميزة</h3>
@@ -336,8 +339,8 @@ footer{
   </div>
 </section>
 
-<!-- Doctor Section -->
-<section class="doctor" id="doctor">
+<!-- Doctor Section (can be hidden by admin) -->
+<section class="doctor" id="doctorSection">
   <div class="doctor-content">
     <h2 id="doctorName">عن الدكتور</h2>
     <p class="specialty" id="doctorSpecialty">استشاري الباطنة</p>
@@ -349,16 +352,16 @@ footer{
   </div>
 </section>
 
-<!-- Gallery Section -->
-<section class="gallery">
+<!-- Gallery Section (can be hidden by admin) -->
+<section class="gallery" id="gallerySection">
   <h3 class="gallery-title">📸 جاليري العيادة</h3>
   <div class="gallery-track" id="galleryTrack">
     <!-- Gallery images loaded dynamically -->
   </div>
 </section>
 
-<!-- Media Library -->
-<section class="media" id="media">
+<!-- Media Library (can be hidden by admin) -->
+<section class="media" id="mediaSection">
   <h2>📚 المكتبة الطبية</h2>
   
   <div class="media-section">
@@ -383,25 +386,25 @@ footer{
   </div>
 </section>
 
-<!-- CTA Section -->
-<section class="cta">
+<!-- CTA Section (Consultations - can be hidden by admin) -->
+<section class="cta" id="consultSection">
   <div class="cta-content">
     <div class="cta-text">
-      <h2>🎯 استشارة مجانية لأول زيارة</h2>
-      <p>احجز الآن واستفد من تقييم طبي شامل بدون رسوم. الأماكن محدودة هذا الشهر!</p>
-      <p><strong>🕐 مواعيد العمل:</strong> يومياً من 12 ظهراً حتى 5 مساءً</p>
+      <h2 id="consultTitle">🎯 استشارة مجانية لأول زيارة</h2>
+      <p id="consultDesc">احجز الآن واستفد من تقييم طبي شامل بدون رسوم. الأماكن محدودة هذا الشهر!</p>
+      <p><strong>🕐 مواعيد العمل:</strong> <span id="consultHours">يومياً من 12 ظهراً حتى 5 مساءً</span></p>
       <p><strong>💻 متاح:</strong> استشارات أونلاين عبر الفيديو</p>
       <div class="cta-buttons">
         <a href="tel:01211538334" class="call-btn">📞 اتصل الآن</a>
-        <a href="https://wa.me/201556614498" class="wa-btn"><i class="fab fa-whatsapp"></i> واتساب</a>
+        <a href="https://wa.me/201556614498" class="wa-btn" id="consultWaBtn"><i class="fab fa-whatsapp"></i> واتساب</a>
       </div>
     </div>
-    <div class="cta-badge">🔥 عرض لفترة محدودة</div>
+    <div class="cta-badge" id="consultBadge">🔥 عرض لفترة محدودة</div>
   </div>
 </section>
 
-<!-- Contact Section -->
-<section class="contact" id="contact">
+<!-- Contact Section (can be hidden by admin) -->
+<section class="contact" id="contactSection">
   <h2 style="text-align:center;margin-bottom:30px;color:var(--primary)">📍 تواصل معنا</h2>
   <div class="contact-grid">
     <div class="contact-card">
@@ -430,17 +433,17 @@ footer{
 <!-- Map Section -->
 <section class="map">
   <div class="map-container">
-    <iframe src="https://www.google.com/maps?q=alexandria+egypt&output=embed" loading="lazy"></iframe>
+    <iframe id="mapFrame" src="https://www.google.com/maps?q=alexandria+egypt&output=embed" loading="lazy"></iframe>
   </div>
 </section>
 
 <!-- Footer -->
 <footer>
-  <p>© <span id="currentYear">2024</span> <span id="clinicNameFooter">ميديكال كلينك</span> - جميع الحقوق محفوظة</p>
+  <p id="footerText">© <span id="currentYear">2024</span> <span id="clinicNameFooter">ميديكال كلينك</span> - جميع الحقوق محفوظة</p>
 </footer>
 
 <!-- WhatsApp Floating Button -->
-<a href="https://wa.me/201556614498" class="wa-float" target="_blank">
+<a href="https://wa.me/201556614498" class="wa-float" id="waFloat" target="_blank">
   <i class="fab fa-whatsapp"></i>
 </a>
 
@@ -450,7 +453,7 @@ footer{
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// ✅ Firebase Config - مشروع الدكتور تامر خطاب ✅ مُحدَّث
+// ✅ ✅ ✅ Firebase Config - مشروع الدكتور تامر خطاب
 const firebaseConfig = {
   apiKey: "AIzaSyCXOOWSZU5YW0diViWO23mIXojmTLIggi0",
   authDomain: "dr-tamer-khatab.firebaseapp.com",
@@ -466,37 +469,92 @@ const db = getFirestore(app);
 const settingsRef = doc(db, "settings", "site");
 const contentRef = collection(db, "content");
 
-// ✅ Load Site Settings
+// ✅ Helper: Get Element
+const $ = (id) => document.getElementById(id);
+
+// ✅ Helper: Adjust Color Brightness (for dynamic theme)
+function adjustColor(hex, percent) {
+  let num = parseInt(hex.replace("#", ""), 16);
+  let r = Math.min(255, Math.max(0, (num >> 16) + percent));
+  let g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + percent));
+  let b = Math.min(255, Math.max(0, (num & 0x0000FF) + percent));
+  return `#${(1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1)}`;
+}
+
+// ✅ Load Site Settings from Firebase
 async function loadSettings() {
   try {
     const snap = await getDoc(settingsRef);
     if (!snap.exists()) return loadDefaults();
-    const s = snap.data().general || {};
+    const s = snap.data();
     
-    // Update DOM elements
-    if (s.clinicName) { document.title = s.clinicName; $("clinicNameFooter").textContent = s.clinicName; }
-    if (s.doctorName) $("doctorName").textContent = s.doctorName;
-    if (s.specialty) $("doctorSpecialty").textContent = s.specialty;
-    if (s.aboutDoctorText) $("doctorBio").textContent = s.aboutDoctorText;
-    if (s.heroDoctorImg) $("heroDoctorImg").src = s.heroDoctorImg;
-    if (s.aboutDoctorImg) $("aboutDoctorImg").src = s.aboutDoctorImg;
-    if (s.clinicAddress) $("clinicAddress").textContent = s.clinicAddress;
-    if (s.phoneNum) { $("phoneNum").textContent = s.phoneNum; $("phoneNum").href = `tel:${s.phoneNum}`; }
-    if (s.whatsappNum) { $("whatsappNum").href = `https://wa.me/${s.whatsappNum}`; }
-    if (s.heroTitle) document.querySelector(".hero-text h1").innerHTML = s.heroTitle;
-    if (s.heroDesc) document.querySelector(".hero-text p").textContent = s.heroDesc;
-    
-    // Apply colors
-    if (s.primaryColor) {
-      document.documentElement.style.setProperty('--primary', s.primaryColor);
-      document.documentElement.style.setProperty('--primary-light', adjustColor(s.primaryColor, 20));
+    // 🔹 General Settings
+    if (s.general) {
+      const g = s.general;
+      if (g.clinicName) { document.title = g.clinicName; $("clinicNameFooter").textContent = g.clinicName; }
+      if (g.doctorName) $("doctorName").textContent = g.doctorName;
+      if (g.specialty) $("doctorSpecialty").textContent = g.specialty;
+      if (g.aboutDoctorText) $("doctorBio").textContent = g.aboutDoctorText;
+      if (g.heroDoctorImg) $("heroDoctorImg").src = g.heroDoctorImg;
+      if (g.aboutDoctorImg) $("aboutDoctorImg").src = g.aboutDoctorImg;
+      if (g.clinicAddress) $("clinicAddress").textContent = g.clinicAddress;
+      if (g.phoneNum) { 
+        $("phoneNum").textContent = g.phoneNum; 
+        $("phoneNum").href = `tel:${g.phoneNum}`; 
+      }
+      if (g.whatsappNum) { 
+        $("whatsappNum").href = `https://wa.me/${g.whatsappNum}`;
+        $("consultWaBtn").href = `https://wa.me/${g.whatsappNum}`;
+        $("waFloat").href = `https://wa.me/${g.whatsappNum}`;
+      }
+      if (g.heroTitle) $("heroTitle").innerHTML = g.heroTitle;
+      if (g.heroDesc) $("heroDesc").textContent = g.heroDesc;
+      if (g.mapLink) $("mapFrame").src = g.mapLink;
+      if (g.footerText) $("footerText").innerHTML = g.footerText.replace('{year}', new Date().getFullYear());
+      
+      // 🔹 Apply Dynamic Colors
+      if (g.primaryColor) {
+        document.documentElement.style.setProperty('--primary', g.primaryColor);
+        document.documentElement.style.setProperty('--primary-light', adjustColor(g.primaryColor, 20));
+      }
+      if (g.bgColor) document.documentElement.style.setProperty('--bg', g.bgColor);
     }
-    if (s.bgColor) document.documentElement.style.setProperty('--bg', s.bgColor);
     
-  } catch (err) { console.warn("⚠️ Load Settings:", err); loadDefaults(); }
+    // 🔹 Visibility Settings (Hide/Show Sections)
+    if (s.visibility) {
+      const v = s.visibility;
+      if (v.hero === false) $("heroSection")?.classList.add('section-hidden');
+      if (v.services === false) $("cardsSection")?.classList.add('section-hidden');
+      if (v.about === false) $("doctorSection")?.classList.add('section-hidden');
+      if (v.gallery === false) $("gallerySection")?.classList.add('section-hidden');
+      if (v.content === false) $("mediaSection")?.classList.add('section-hidden');
+      if (v.consult === false) $("consultSection")?.classList.add('section-hidden');
+      if (v.contact === false) $("contactSection")?.classList.add('section-hidden');
+    }
+    
+    // 🔹 Consult Section Settings
+    if (s.consult) {
+      const c = s.consult;
+      if (c.title) $("consultTitle").textContent = c.title;
+      if (c.desc) $("consultDesc").textContent = c.desc;
+      if (c.hours) $("consultHours").textContent = c.hours;
+      if (c.badge) $("consultBadge").textContent = c.badge;
+      if (c.show === false) $("consultSection")?.classList.add('section-hidden');
+    }
+    
+    // 🔹 Gallery Settings
+    if (s.gallery?.autoScroll === false) {
+      const track = $("galleryTrack");
+      if (track) track.style.animation = 'none';
+    }
+    
+  } catch (err) { 
+    console.warn("⚠️ Load Settings:", err); 
+    loadDefaults(); 
+  }
 }
 
-// ✅ Load Content (Images, Videos, Articles)
+// ✅ Load Content (Images, Videos, Articles) from Firebase
 async function loadContent() {
   try {
     const snap = await getDocs(contentRef);
@@ -512,10 +570,13 @@ async function loadContent() {
     renderMedia("articlesContainer", items.article, "article");
     renderGallery(items.image);
     
-  } catch (err) { console.error("❌ Load Content:", err); showEmptyStates(); }
+  } catch (err) { 
+    console.error("❌ Load Content:", err); 
+    showEmptyStates(); 
+  }
 }
 
-// ✅ Render Media Grid
+// ✅ Render Media Grid (Images/Videos/Articles)
 function renderMedia(containerId, items, type) {
   const container = $(containerId);
   if (!items.length) {
@@ -523,20 +584,26 @@ function renderMedia(containerId, items, type) {
     return;
   }
   container.innerHTML = items.map(item => {
-    if (type === "image") return `<div class="media-card"><img src="${item.link}" alt="${item.title}" onerror="this.parentElement.innerHTML='<div class=empty>صورة غير متاحة</div>'"></div>`;
-    if (type === "video") return `<div class="media-card"><video controls><source src="${item.link}">متصفحك لا يدعم الفيديو</video>${item.title ? `<div class="content"><h4>${item.title}</h4>${item.desc ? `<p>${item.desc}</p>` : ""}</div>` : ""}</div>`;
-    if (type === "article") return `<div class="media-card"><div class="content"><span class="badge badge-article">📄 مقال</span><h4>${item.title}</h4>${item.desc ? `<p>${item.desc}</p>` : ""}${item.link ? `<a href="${item.link}" target="_blank" style="color:var(--primary);font-size:13px">اقرأ المزيد →</a>` : ""}</div></div>`;
+    if (type === "image") {
+      return `<div class="media-card"><img src="${item.link}" alt="${item.title}" onerror="this.parentElement.innerHTML='<div class=empty>صورة غير متاحة</div>'"></div>`;
+    }
+    if (type === "video") {
+      return `<div class="media-card"><video controls><source src="${item.link}">متصفحك لا يدعم الفيديو</video>${item.title ? `<div class="content"><h4>${item.title}</h4>${item.desc ? `<p>${item.desc}</p>` : ""}</div>` : ""}</div>`;
+    }
+    if (type === "article") {
+      return `<div class="media-card"><div class="content"><span class="badge badge-article">📄 مقال</span><h4>${item.title}</h4>${item.desc ? `<p>${item.desc}</p>` : ""}${item.link ? `<a href="${item.link}" target="_blank" style="color:var(--primary);font-size:13px">اقرأ المزيد →</a>` : ""}</div></div>`;
+    }
   }).join("");
 }
 
-// ✅ Render Gallery (Auto-scroll)
+// ✅ Render Gallery (Auto-scroll with duplicate for seamless loop)
 function renderGallery(images) {
   const track = $("galleryTrack");
   if (!images.length) {
     track.innerHTML = `<div style="padding:20px;color:var(--muted)">لا توجد صور في الجاليري</div>`;
     return;
   }
-  // Duplicate for seamless scroll
+  // Duplicate for seamless infinite scroll
   const html = images.map(img => `<div class="gallery-item"><img src="${img.link}" alt="${img.title||''}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22180%22><rect fill=%22%23eee%22 width=%22100%%22 height=%22100%%22/></svg>'"></div>`).join("");
   track.innerHTML = html + html;
 }
@@ -548,37 +615,26 @@ function showEmptyStates() {
   });
 }
 
-// ✅ Load Defaults if no settings
+// ✅ Load Defaults if no settings in Firebase
 function loadDefaults() {
   $("currentYear").textContent = new Date().getFullYear();
-}
-
-// ✅ Helper: Get Element
-const $ = (id) => document.getElementById(id);
-
-// ✅ Helper: Adjust Color Brightness
-function adjustColor(hex, percent) {
-  let num = parseInt(hex.replace("#", ""), 16);
-  let r = Math.min(255, Math.max(0, (num >> 16) + percent));
-  let g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + percent));
-  let b = Math.min(255, Math.max(0, (num & 0x0000FF) + percent));
-  return `#${(1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1)}`;
+  console.log("ℹ️ Using default settings (no Firebase settings found)");
 }
 
 // ✅ Mobile Menu Toggle
-window.toggleMenu = () => $("navbar").classList.toggle("active");
+window.toggleMenu = () => $("navbar")?.classList.toggle("active");
 
 // ✅ Close navbar on link click (mobile)
 document.querySelectorAll(".navbar a").forEach(link => {
-  link.addEventListener("click", () => $("navbar").classList.remove("active"));
+  link.addEventListener("click", () => $("navbar")?.classList.remove("active"));
 });
 
-// ✅ Initialize
+// ✅ Initialize Page
 document.addEventListener("DOMContentLoaded", async () => {
   $("currentYear").textContent = new Date().getFullYear();
   await loadSettings();
   await loadContent();
-  console.log("✅ Main Page Loaded - Firebase Connected");
+  console.log("✅ Main Page Loaded - dr-tamer-khatab Connected");
 });
 </script>
 </body>
